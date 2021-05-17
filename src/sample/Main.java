@@ -26,26 +26,26 @@ import java.util.Scanner;
 
 public class Main extends Application {
 
-    public static Wallpaper wallpaper;
+    public static MacroObjSite[] sites = new MacroObjSite[2];
+    public static MacroObjSpawn[] spawns = new MacroObjSpawn[2];
+    public static MicroObject[] microObjects;
 
     static AnimationTimer timer;
     static Group group = new Group();
     static Scene scene;
     static BorderPane layout;
+    public static Wallpaper wallpaper;
     public static ScrollPane scrollPane;
 
+    //get screen size to render appropriate window
     Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
     double width = screenSize.getWidth();
     double height = screenSize.getHeight();
 
     @Override
     public void start(Stage primaryStage) throws Exception{
-//        Parent root = FXMLLoader.load(getClass().getResource("sample.fxml"));
-//        primaryStage.setTitle("Hello World");
-//        primaryStage.setScene(new Scene(root, 300, 275));
-//        primaryStage.show();
-
         SpawnWallpaper();
+        SpawnMacros();
 
         Group root = new Group(group);
         scrollPane = new ScrollPane(root);
@@ -60,7 +60,6 @@ public class Main extends Application {
         layout.setCenter(scrollPane);
 
         scene = new Scene(layout, this.width,this.height);
-
 
         timer = new AnimationTimer() {
             @Override
@@ -81,6 +80,22 @@ public class Main extends Application {
 
     public static void main(String[] args) {
         launch(args);
+    }
+
+    static void SpawnMacros() throws FileNotFoundException {
+        Main.spawns[0] = new MacroObjSpawn("ct");
+        Main.spawns[1] = new MacroObjSpawn("t");
+
+        Main.sites[0] = new MacroObjSite("a");
+        Main.sites[1] = new MacroObjSite("b");
+
+        for (MacroObjSpawn spawn : spawns){
+            group.getChildren().add(spawn.spawnGroup);
+        }
+
+        for (MacroObjSite site : sites){
+            group.getChildren().add(site.siteGroup);
+        }
     }
 
 //    public static void main(String[] args) {

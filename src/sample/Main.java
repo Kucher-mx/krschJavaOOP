@@ -22,13 +22,15 @@ import javafx.stage.Stage;
 
 import java.awt.*;
 import java.io.FileNotFoundException;
+import java.util.Random;
 import java.util.Scanner;
 
 public class Main extends Application {
 
     public static MacroObjSite[] sites = new MacroObjSite[2];
     public static MacroObjSpawn[] spawns = new MacroObjSpawn[2];
-    public static MicroObject[] microObjects;
+    public static MicroObject[] microObjectsT;
+    public static MicroObject[] microObjectsCT;
 
     static AnimationTimer timer;
     static Group group = new Group();
@@ -36,7 +38,7 @@ public class Main extends Application {
     static BorderPane layout;
     public static Wallpaper wallpaper;
     public static ScrollPane scrollPane;
-
+    final static Random random = new Random();
     //get screen size to render appropriate window
     Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
     double width = screenSize.getWidth();
@@ -46,6 +48,7 @@ public class Main extends Application {
     public void start(Stage primaryStage) throws Exception{
         SpawnWallpaper();
         SpawnMacros();
+        SpawnMicros(5);
 
         Group root = new Group(group);
         scrollPane = new ScrollPane(root);
@@ -64,6 +67,7 @@ public class Main extends Application {
         timer = new AnimationTimer() {
             @Override
             public void handle(long now) {
+                Main.MoveMicro();
             }
         };
 
@@ -97,6 +101,69 @@ public class Main extends Application {
             group.getChildren().add(site.siteGroup);
         }
     }
+
+    static void MoveMicro(){
+        for (MicroObject micro : Main.microObjectsT){
+            micro.run();
+        }
+
+        for (MicroObject micro : Main.microObjectsCT){
+            micro.run();
+        }
+    }
+
+    static void SpawnMicros(int size) throws FileNotFoundException {
+        Main.microObjectsCT = new MicroObject[size];
+        Main.microObjectsT = new MicroObject[size];
+
+        for(int i = 0; i < Main.microObjectsCT.length; i++){
+            int rnd = random.nextInt((int)3);
+            switch (rnd){
+                case 0:
+                    Main.microObjectsCT[i] = new MicroObject("ct");
+                    break;
+                case 1:
+                    Main.microObjectsCT[i] = new MicroObjectOne("ct");
+                    break;
+                case 2:
+                    Main.microObjectsCT[i] = new MicroObjectTwo("ct");
+                    break;
+            }
+        }
+
+        for(int i = 0; i < Main.microObjectsT.length; i++){
+            int rnd = random.nextInt((int)3);
+            switch (rnd){
+                case 0:
+                    Main.microObjectsT[i] = new MicroObject("t");
+                    break;
+                case 1:
+                    Main.microObjectsT[i] = new MicroObjectOne("t");
+                    break;
+                case 2:
+                    Main.microObjectsT[i] = new MicroObjectTwo("t");
+                    break;
+            }
+        }
+
+        for (MicroObject micro : Main.microObjectsT){
+            group.getChildren().add(micro.microGroup);
+        }
+
+        for (MicroObject micro : Main.microObjectsCT){
+            group.getChildren().add(micro.microGroup);
+        }
+
+//        for (MicroObject m : Main.microObjectsCT){
+//            System.out.println(m + "\n");
+//        }
+//
+//        for (MicroObject m : Main.microObjectsT){
+//            System.out.println(m + "\n");
+//        }
+    }
+
+
 
 //    public static void main(String[] args) {
 //        launch(args);

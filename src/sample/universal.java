@@ -1,5 +1,6 @@
 package sample;
 
+import java.io.FileNotFoundException;
 import java.util.*;
 import java.util.Scanner;
 import java.util.LinkedList;
@@ -13,7 +14,7 @@ public class universal {
     LinkedList spawns  = new LinkedList();
     LinkedList sites  = new LinkedList();
 
-    public universal(){
+    public universal() throws FileNotFoundException {
         System.out.print("size of the teams: ");
         teamSize = in.nextInt();
 
@@ -30,7 +31,7 @@ public class universal {
         this.createArraysMicroT(teamSize);
     }
 
-    public void createArraysMicroT(int size){
+    public void createArraysMicroT(int size) throws FileNotFoundException {
         for (int i = 0; i < size; i++){
             System.out.print("enter a lvl of the unit: ");
             int lvl = in.nextInt();
@@ -52,7 +53,7 @@ public class universal {
         }
     }
 
-    public void createArraysMicroCT(int size){
+    public void createArraysMicroCT(int size) throws FileNotFoundException {
         for (int i = 0; i < size; i++){
             System.out.print("enter a lvl of the unit: ");
             int lvl = in.nextInt();
@@ -74,7 +75,7 @@ public class universal {
         }
     }
 
-    public void addMicroObj(){
+    public void addMicroObj() throws FileNotFoundException {
         System.out.println("enter a side of the unit t-ct");
         String unitSide = in.next();
         System.out.println("enter a level of the unit 1-3");
@@ -244,7 +245,7 @@ public class universal {
         return count;
     }
 
-    public void deleteMicro(){
+    public void deleteMicro() throws FileNotFoundException {
         System.out.println("enter the side of the unit: (t-ct) ");
         String side = in.next();
         System.out.println("enter the lvl of the unit: (1-3) ");

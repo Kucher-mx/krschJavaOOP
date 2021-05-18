@@ -1,5 +1,13 @@
 package sample;
 
+import javafx.scene.Group;
+import javafx.scene.control.Label;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.shape.Rectangle;
+
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.util.Comparator;
 
 public class MicroObject implements Comparable<MicroObject>, Cloneable {
@@ -14,12 +22,16 @@ public class MicroObject implements Comparable<MicroObject>, Cloneable {
     private int allAmmo = 100;
     private int chamber = 25;
     private int stamina = 100;
-    private long charCordsX = 0;
-    private long charCordsY = 0;
-    private double angle = 0;
+    private double charCordsX;
+    private double charCordsY;
+    private double destinationX;
+    private double destinationY;
 
-    //    public int objId = MicroObject.id;
-//    public static int id = 0;
+    protected Label microLabel;
+    protected Group microGroup;
+    protected Image microImage;
+    protected ImageView microImageView;
+
     public int getLvl(){
         return this.characterLevel;
     }
@@ -71,14 +83,66 @@ public class MicroObject implements Comparable<MicroObject>, Cloneable {
         this.damage = newDamage;
     }
 
-    public MicroObject(String side){
+    public double getX(){
+        return this.charCordsX;
+    }
+
+    public void setXCoord(double newX){
+        this.charCordsX = newX;
+    }
+
+    public double getY(){
+        return this.charCordsY;
+    }
+
+    public void setYCoord(double newY){
+        this.charCordsY = newY;
+    }
+
+    public static double coordsTX = 1300.0;
+    public static double coordsTY = 2700.0;
+    public static double coordsCTX = 2050.0;
+    public static double coordsCTY = 570.0;
+
+    public MicroObject(String side) throws FileNotFoundException {
         this.characterSite = side;
         this.characterLevel = 1;
         this.characterSpeed = 20;
         this.damage = 15;
         this.characterKevlar = 0;
         this.characterHp = 100;
-//        MicroObject.id++;
+        this.destinationX = (double)Main.random.nextInt(3700);
+        this.destinationY = (double)Main.random.nextInt(3000);
+
+        this.microLabel = new Label("Lvl: 1, hp: "  + this.getHp());
+        if(side.equals("t")){
+            this.charCordsX = MicroObject.coordsTX;
+            this.charCordsY = MicroObject.coordsTY;
+
+            microImage = new Image(new FileInputStream("src/source/t_1.png"));
+            this.microImageView = new ImageView(microImage);
+            this.microImageView.setX(this.charCordsX);
+            this.microImageView.setY(this.charCordsY);
+            this.microLabel.setTranslateX(this.charCordsX);
+            this.microLabel.setTranslateY(this.charCordsY - 25.0);
+            MicroObject.coordsTX += 75;
+        }else{
+            this.charCordsX = MicroObject.coordsCTX;
+            this.charCordsY = MicroObject.coordsCTY;
+
+            microImage = new Image(new FileInputStream("src/source/ct_1.png"));
+            this.microImageView = new ImageView(microImage);
+            this.microImageView.setX(this.charCordsX);
+            this.microImageView.setY(this.charCordsY);
+            this.microLabel.setTranslateX(this.charCordsX);
+            this.microLabel.setTranslateY(this.charCordsY - 25.0);
+            MicroObject.coordsCTX += 75;
+        }
+        this.microImageView.setPreserveRatio(true);
+        this.microImageView.setFitHeight(100.0);
+        this.microImageView.setFitWidth(75.0);
+
+        this.microGroup = new Group(this.microImageView, this.microLabel);
     }
 
     public void print(){
@@ -125,9 +189,66 @@ public class MicroObject implements Comparable<MicroObject>, Cloneable {
     }
 
     public void run(){
-        this.charCordsX = Math.round(Math.cos(this.angle) * this.characterSpeed);
-        this.charCordsY = Math.round(Math.sin(this.angle) * this.characterSpeed);
+        System.out.println();
+        System.out.println("coordx: " + this.getX() + ", destx: " + this.destinationX);
+        System.out.println("coordy: " + this.getY() + ", desty: " + this.destinationY);
+        System.out.println();
 
+        if(Math.round(this.getX()) == Math.round(this.destinationX)){
+
+            System.out.println("change destx");
+            this.destinationX = (double)Main.random.nextInt(3700);
+
+        }else if(Math.round(this.getY()) == Math.round(this.destinationY)){
+
+            System.out.println("change desty");
+            this.destinationY = (double)Main.random.nextInt(3000);
+
+        }else{
+            double xDiff = this.destinationX - this.getX();
+            double yDiff = this.destinationY - this.getY();
+            //handling x difference
+            if(xDiff < 0){
+
+                if(Math.abs(xDiff) <= this.characterSpeed){
+                    this.setXCoord(this.getX() - (Math.abs(xDiff)/30));
+                }else{
+                    this.setXCoord(this.getX() - (this.characterSpeed/30));
+                }
+
+            }else if(xDiff > 0){
+
+                if(xDiff <= this.characterSpeed){
+                    this.setXCoord(this.getX() + (xDiff/30));
+                }else{
+                    this.setXCoord(this.getX() + (this.characterSpeed/30));
+                }
+
+            }
+            //handling y difference
+            if(yDiff < 0){
+
+                if(Math.abs(yDiff) <= this.characterSpeed){
+                    this.setYCoord(this.getY() - (Math.abs(yDiff)/10));
+                }else{
+                    this.setYCoord(this.getY() - (this.characterSpeed/10));
+                }
+
+            }else if(yDiff > 0){
+
+                if(yDiff <= this.characterSpeed){
+                    this.setYCoord(this.getY() + (yDiff/10));
+                }else{
+                    this.setYCoord(this.getY() + (this.characterSpeed/10));
+                }
+
+            }
+        }
+
+        this.microImageView.setX(this.charCordsX);
+        this.microImageView.setY(this.charCordsY);
+        this.microLabel.setTranslateX(this.charCordsX);
+        this.microLabel.setTranslateY(this.charCordsY + 25);
     }
 
     public void reload(){
@@ -160,8 +281,10 @@ public class MicroObject implements Comparable<MicroObject>, Cloneable {
                 "site: " + characterSite +
                 ", hp: " + characterHp +
                 ", lvl: " + characterLevel +
-                ", kevlar" + characterKevlar +
-                ", damage" + damage +
+                ", kevlar: " + characterKevlar +
+                ", damage: " + damage +
+                ", x: " + charCordsX +
+                ", y: " + charCordsY +
                 " }";
     }
 
@@ -186,7 +309,11 @@ public class MicroObject implements Comparable<MicroObject>, Cloneable {
     @Override
     public Object clone() throws CloneNotSupportedException {
         MicroObject tmp = null;
-        tmp = new MicroObject(this.characterSite);
+        try {
+            tmp = new MicroObject(this.characterSite);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
         return tmp;
     }
 

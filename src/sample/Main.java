@@ -31,21 +31,23 @@ public class Main extends Application {
     public static MacroObjSpawn[] spawns = new MacroObjSpawn[2];
     public static MicroObject[] microObjectsT;
     public static MicroObject[] microObjectsCT;
+    public static int teamSize;
 
     static AnimationTimer timer;
     static Group group = new Group();
     static Scene scene;
     static BorderPane layout;
     public static Wallpaper wallpaper;
+    public static DialogWindow dialogWindow;
     public static ScrollPane scrollPane;
+    public static Stage primaryStage;
     final static Random random = new Random();
     //get screen size to render appropriate window
     Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-    double width = screenSize.getWidth();
+    double  width = screenSize.getWidth();
     double height = screenSize.getHeight();
 
-    @Override
-    public void start(Stage primaryStage) throws Exception{
+    public static void setMainStage(double width, double height) throws FileNotFoundException {
         SpawnWallpaper();
         SpawnMacros();
         SpawnMicros(5);
@@ -62,7 +64,9 @@ public class Main extends Application {
         layout = new BorderPane();
         layout.setCenter(scrollPane);
 
-        scene = new Scene(layout, this.width,this.height);
+        scene = new Scene(layout, width, height);
+        primaryStage.setTitle("CS clone");
+        primaryStage.setScene(scene);
 
         timer = new AnimationTimer() {
             @Override
@@ -71,13 +75,51 @@ public class Main extends Application {
             }
         };
 
-        primaryStage.setTitle("CS clone");
-        primaryStage.setScene(scene);
+        timer.start();
+    }
+
+    public static void setSetupStage(){
+        dialogWindow = new DialogWindow();
+        Main.primaryStage.setTitle("Test Dialog");
+        Main.primaryStage.setScene(dialogWindow.returnDialogScene());
+    }
+
+    @Override
+    public void start(Stage primaryStage) throws Exception{
+        Main.primaryStage = primaryStage;
+        Main.setSetupStage();
+//        SpawnWallpaper();
+//        SpawnMacros();
+//        SpawnMicros(5);
+//
+//        Group root = new Group(group);
+//        scrollPane = new ScrollPane(root);
+//
+//        scrollPane.setMaxWidth(Wallpaper.border.getWidth());
+//        scrollPane.setMaxHeight(Wallpaper.border.getHeight());
+//
+//        scrollPane.setFitToHeight(true);
+//        scrollPane.setFitToWidth(true);
+//
+//        layout = new BorderPane();
+//        layout.setCenter(scrollPane);
+//
+//        scene = new Scene(layout, this.width,this.height);
+//
+//        timer = new AnimationTimer() {
+//            @Override
+//            public void handle(long now) {
+////                Main.MoveMicro();
+//            }
+//        };
+//
+//        primaryStage.setTitle("CS clone");
+//        primaryStage.setScene(scene);
         timer.start();
         primaryStage.show();
     }
 
-    public void SpawnWallpaper() throws FileNotFoundException {
+    public static void SpawnWallpaper() throws FileNotFoundException {
         wallpaper = new Wallpaper();
         group.getChildren().add(wallpaper.getWallGroup());
     };
@@ -86,7 +128,7 @@ public class Main extends Application {
         launch(args);
     }
 
-    static void SpawnMacros() throws FileNotFoundException {
+    public static void SpawnMacros() throws FileNotFoundException {
         Main.spawns[0] = new MacroObjSpawn("ct");
         Main.spawns[1] = new MacroObjSpawn("t");
 

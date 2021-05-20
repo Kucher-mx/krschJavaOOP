@@ -6,6 +6,7 @@ import javafx.event.EventHandler;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.scene.Group;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.Button;
@@ -24,6 +25,7 @@ import javafx.scene.text.Text;
 
 import java.awt.*;
 import java.io.FileNotFoundException;
+import java.util.ArrayList;
 
 public class DialogWindow {
     //Creating a dialog
@@ -48,6 +50,7 @@ public class DialogWindow {
         pane.getColumnConstraints().add(new ColumnConstraints(175));
         pane.getColumnConstraints().add(new ColumnConstraints(100));
         pane.getRowConstraints().add(new RowConstraints(100));
+
         GridPane.setHalignment(button, HPos.CENTER);
         pane.setGridLinesVisible(true);
 
@@ -68,6 +71,7 @@ public class DialogWindow {
                     while(pane.getColumnConstraints().size() > 0){
                         pane.getColumnConstraints().remove(0);
                     }
+
                     pane.getRowConstraints().add(new RowConstraints(75));
                     pane.getRowConstraints().add(new RowConstraints(75));
                     pane.getColumnConstraints().add(new ColumnConstraints(120));
@@ -78,7 +82,10 @@ public class DialogWindow {
                         if(i < Main.teamSize - 1){
                             pane.getColumnConstraints().add(new ColumnConstraints(120));
                         }
-                        pane.add(new ChoiceBox(FXCollections.observableArrayList("First level", "Second level", "Third level")), i , 1);
+                        ChoiceBox select = new ChoiceBox(FXCollections.observableArrayList("First level", "Second level", "Third level"));
+                        select.getSelectionModel().select(0);
+                        select.setId("ct");
+                        pane.add(select, i , 1);
                     }
 
                     pane.getRowConstraints().add(new RowConstraints(75));
@@ -86,7 +93,10 @@ public class DialogWindow {
                     Label tSite = new Label("fill t characters: ");
                     pane.add(tSite, 0, 2);
                     for (int i = 0; i < Main.teamSize; i++){
-                        pane.add(new ChoiceBox(FXCollections.observableArrayList("First level", "Second level", "Third level")), i, 3);
+                        ChoiceBox select = new ChoiceBox(FXCollections.observableArrayList("First level", "Second level", "Third level"));
+                        select.getSelectionModel().select(0);
+                        select.setId("t");
+                        pane.add(select, i, 3);
                     }
 
                     pane.getRowConstraints().add(new RowConstraints(75));
@@ -96,11 +106,42 @@ public class DialogWindow {
 
                         @Override
                         public void handle(ActionEvent e) {
+                            ArrayList<String> ctLvls = new ArrayList<String>();
+                            ArrayList<String> tLvls = new ArrayList<String>();
+                            for (Node child : pane.getChildren()) {
+                                Integer column = GridPane.getColumnIndex(child);
+                                Integer row = GridPane.getRowIndex(child);
+                                if ((column != null && row != null) && (row == 1 || row == 3)) {
+                                    ChoiceBox node = (ChoiceBox)child;
+                                    System.out.println("type of value" + node.getValue() + " id: " + node.getId());
+                                    if(node.getId().equals("ct")){
+                                        ctLvls.add((String) node.getValue());
+                                    }else if(node.getId().equals("t")){
+                                        tLvls.add((String) node.getValue());
+                                    }
+                                }
+                            }
+
+//                            try {
+//                                Main.SpawnMicros(ctLvls, "ct");
+//                                Main.SpawnMicros(tLvls, "t");
+//                            } catch (FileNotFoundException fileNotFoundException) {
+//                                fileNotFoundException.printStackTrace();
+//                            }
+
+//                            for (String el : ctLvls){
+//                                System.out.println("ct: " + el);
+//                            }
+//
+//                            for (String el : tLvls){
+//                                System.out.println("t: " + el);
+//                            }
+
                             Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
                             double  width = screenSize.getWidth();
                             double height = screenSize.getHeight();
                             try {
-                                Main.setMainStage(width, height);
+                                Main.setMainStage(width, height, ctLvls, tLvls);
                             } catch (FileNotFoundException fileNotFoundException) {
                                 fileNotFoundException.printStackTrace();
                             }

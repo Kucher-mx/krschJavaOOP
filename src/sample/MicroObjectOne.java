@@ -37,31 +37,50 @@ public class MicroObjectOne extends MicroObject{
         this.speedKoef = 1.5;
         this.staminaWasteKoef = 1;
 
-//        System.out.println("coords #2: " + super.getX() + " " + super.getY());
-
         this.microLabel = new Label("Lvl: 2, hp: "  + this.getHp());
         if(side.equals("t")){
             microImage = new Image(new FileInputStream("src/source/t_2.png"));
             this.microImageView = new ImageView(microImage);
-            this.microImageView = new ImageView(microImage);
-            this.microImageView.setX(MicroObject.coordsTX);
-            this.microImageView.setY(MicroObject.coordsTY);
-            this.microLabel.setTranslateX(MicroObject.coordsTX);
-            this.microLabel.setTranslateY(MicroObject.coordsTY - 25.0);
-//            MicroObject.coordsTX += 50;
+
+            this.microWrapper.setTranslateX(this.getX());
+            this.microWrapper.setTranslateY(this.getY());
+
+//            this.microImageView.setX(MicroObject.coordsTX);
+//            this.microImageView.setY(MicroObject.coordsTY);
+//            this.microLabel.setTranslateX(MicroObject.coordsTX);
+//            this.microLabel.setTranslateY(MicroObject.coordsTY - 25.0);
         }else{
             microImage = new Image(new FileInputStream("src/source/ct_2.png"));
             this.microImageView = new ImageView(microImage);
-            this.microImageView.setX(MicroObject.coordsCTX);
-            this.microImageView.setY(MicroObject.coordsCTY);
-            this.microLabel.setTranslateX(MicroObject.coordsCTX);
-            this.microLabel.setTranslateY(MicroObject.coordsCTY - 25.0);
-//            MicroObject.coordsCTX += 50;
+
+            this.microWrapper.setTranslateX(this.getX());
+            this.microWrapper.setTranslateY(this.getY());
+
+//            this.microImageView.setX(MicroObject.coordsCTX);
+//            this.microImageView.setY(MicroObject.coordsCTY);
+//            this.microLabel.setTranslateX(MicroObject.coordsCTX);
+//            this.microLabel.setTranslateY(MicroObject.coordsCTY - 25.0);
         }
         this.microImageView.setPreserveRatio(true);
-        this.microImageView.setFitHeight(100.0);
-        this.microImageView.setFitWidth(75.0);
-        this.microGroup = new Group(this.microImageView, this.microLabel);
+        this.microImageView.setFitHeight(120.0);
+        this.microImageView.setFitWidth(90.0);
+
+        this.microWrapper.setOnMouseClicked((event) -> {
+            this.changeActive();
+            if(this.getActive()) {
+                String styleWrapper = "-fx-border-color: red;"
+                        + "-fx-border-width: 1;"
+                        + "-fx-border-style: dotted;";
+                this.microWrapper.setStyle(styleWrapper);
+            }else {
+                this.microWrapper.setStyle(" ");
+            }
+        });
+
+        this.microWrapper.getChildren().clear();
+        this.microWrapper.getChildren().addAll(this.microImageView, this.microLabel);
+        this.microGroup = new Group(this.microWrapper);
+//        this.microGroup = new Group(this.microImageView, this.microLabel);
     }
 
     public void callBaseMethod(){
@@ -75,6 +94,7 @@ public class MicroObjectOne extends MicroObject{
     @Override
     public String toString() {
         return "Unit#2: { " +
+                "id: " + id +
                 "site: " + super.getSide() +
                 ", hp: " + super.getHp() +
                 ", lvl: " + characterLevel +

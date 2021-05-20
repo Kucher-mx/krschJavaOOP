@@ -1,11 +1,21 @@
 package sample;
 
+import javafx.event.EventHandler;
+import javafx.geometry.BoundingBox;
+import javafx.geometry.Bounds;
+import javafx.geometry.Insets;
 import javafx.scene.Group;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.Border;
+import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 
+import java.awt.*;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.Comparator;
@@ -18,19 +28,21 @@ public class MicroObject implements Comparable<MicroObject>, Cloneable {
     private int characterKevlar;
     private int characterHp;
     private boolean alive = true;
+    private boolean active = false;
 
-    private int allAmmo = 100;
-    private int chamber = 25;
     private int stamina = 100;
     private double charCordsX;
     private double charCordsY;
     private double destinationX;
     private double destinationY;
+    public int id;
 
+    protected VBox microWrapper = new VBox();
     protected Label microLabel;
     protected Group microGroup;
     protected Image microImage;
     protected ImageView microImageView;
+    public static int idCounter = 0;
 
     public int getLvl(){
         return this.characterLevel;
@@ -99,6 +111,14 @@ public class MicroObject implements Comparable<MicroObject>, Cloneable {
         this.charCordsY = newY;
     }
 
+    public void changeActive(){
+        this.active = !this.active;
+    }
+
+    public boolean getActive(){
+        return this.active;
+    }
+
     public static double coordsTX = 1300.0;
     public static double coordsTY = 2700.0;
     public static double coordsCTX = 2050.0;
@@ -111,6 +131,7 @@ public class MicroObject implements Comparable<MicroObject>, Cloneable {
         this.damage = 15;
         this.characterKevlar = 0;
         this.characterHp = 100;
+        this.id = MicroObject.idCounter;
         this.destinationX = (double)Main.random.nextInt(3700);
         this.destinationY = (double)Main.random.nextInt(3000);
 
@@ -121,10 +142,10 @@ public class MicroObject implements Comparable<MicroObject>, Cloneable {
 
             microImage = new Image(new FileInputStream("src/source/t_1.png"));
             this.microImageView = new ImageView(microImage);
-            this.microImageView.setX(this.charCordsX);
-            this.microImageView.setY(this.charCordsY);
-            this.microLabel.setTranslateX(this.charCordsX);
-            this.microLabel.setTranslateY(this.charCordsY - 25.0);
+
+            this.microWrapper.setTranslateX(this.charCordsX);
+            this.microWrapper.setTranslateY(this.charCordsY);
+
             MicroObject.coordsTX += 75;
         }else{
             this.charCordsX = MicroObject.coordsCTX;
@@ -132,17 +153,34 @@ public class MicroObject implements Comparable<MicroObject>, Cloneable {
 
             microImage = new Image(new FileInputStream("src/source/ct_1.png"));
             this.microImageView = new ImageView(microImage);
-            this.microImageView.setX(this.charCordsX);
-            this.microImageView.setY(this.charCordsY);
-            this.microLabel.setTranslateX(this.charCordsX);
-            this.microLabel.setTranslateY(this.charCordsY - 25.0);
+
+            this.microWrapper.setTranslateX(this.charCordsX);
+            this.microWrapper.setTranslateY(this.charCordsY);
+
             MicroObject.coordsCTX += 75;
         }
+        this.microLabel.setStyle("-fx-border-color: white;");
         this.microImageView.setPreserveRatio(true);
-        this.microImageView.setFitHeight(100.0);
-        this.microImageView.setFitWidth(75.0);
+        this.microImageView.setFitHeight(120.0);
+        this.microImageView.setFitWidth(90.0);
 
-        this.microGroup = new Group(this.microImageView, this.microLabel);
+        this.microWrapper.setOnMouseClicked((event) -> {
+            this.changeActive();
+            if(this.getActive()) {
+                String styleWrapper = "-fx-border-color: red;"
+                        + "-fx-border-width: 1;"
+                        + "-fx-border-style: dotted;";
+                this.microWrapper.setStyle(styleWrapper);
+            }else {
+                this.microWrapper.setStyle(" ");
+            }
+        });
+
+        this.microWrapper.getChildren().addAll(this.microImageView, this.microLabel);
+        this.microGroup = new Group(this.microWrapper);
+
+//        this.microGroup = new Group(this.microImageView, this.microLabel);
+        MicroObject.idCounter++;
     }
 
     public void print(){
@@ -153,6 +191,47 @@ public class MicroObject implements Comparable<MicroObject>, Cloneable {
         );
     }
 
+    public void checkActivate(double x, double y){
+
+        Bounds microBounds = this.microWrapper.boundsInParentProperty().get();
+        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+        double  width = screenSize.getWidth();
+        double height = screenSize.getHeight();
+
+        double xCoef = 3700 / width;
+        double yCoef = 3000 / height;
+
+        double xCoord = x;
+        double yCoord = y;
+
+
+//        System.out.println(this.microWrapper.boundsInParentProperty().get());
+//        this.microWrapper.setOnMouseClicked(new EventHandler<MouseEvent>() {
+//            @Override
+//            public void handle(MouseEvent mouseEvent) {
+//                System.out.println("activate :" + this);
+//            }
+//        });
+//        System.out.println(this.microWrapper.boundsInParentProperty().get().contains(x,y));
+
+
+        System.out.println("checking click " + (x) + " " + (y));
+        System.out.println(microBounds.getMinX() + " y " + microBounds.getMinY());
+        System.out.println(microBounds.getMaxX() + " y " + microBounds.getMaxY());
+        if((microBounds.getMinX() <= (x) && microBounds.getMaxX() >= (x))
+                && (microBounds.getMinY() <= (y) && microBounds.getMaxY() >= (y))){
+            System.out.println("clicked: " + this);
+            this.changeActive();
+            if(this.getActive()) {
+                String styleWrapper = "-fx-border-color: red;"
+                        + "-fx-border-width: 1;"
+                        + "-fx-border-style: dotted;";
+                this.microWrapper.setStyle(styleWrapper);
+            }else {
+                this.microWrapper.setStyle(" ");
+            }
+        }
+    }
 
     public String interactWith(MicroObject enemy){
         while(!(enemy.getHp() <= 0 || this.getHp() <= 0)){
@@ -189,19 +268,14 @@ public class MicroObject implements Comparable<MicroObject>, Cloneable {
     }
 
     public void run(){
-        System.out.println();
-        System.out.println("coordx: " + this.getX() + ", destx: " + this.destinationX);
-        System.out.println("coordy: " + this.getY() + ", desty: " + this.destinationY);
-        System.out.println();
-
         if(Math.round(this.getX()) == Math.round(this.destinationX)){
 
-            System.out.println("change destx");
+//            System.out.println("change destx");
             this.destinationX = (double)Main.random.nextInt(3700);
 
         }else if(Math.round(this.getY()) == Math.round(this.destinationY)){
 
-            System.out.println("change desty");
+//            System.out.println("change desty");
             this.destinationY = (double)Main.random.nextInt(3000);
 
         }else{
@@ -245,15 +319,12 @@ public class MicroObject implements Comparable<MicroObject>, Cloneable {
             }
         }
 
-        this.microImageView.setX(this.charCordsX);
-        this.microImageView.setY(this.charCordsY);
-        this.microLabel.setTranslateX(this.charCordsX);
-        this.microLabel.setTranslateY(this.charCordsY + 25);
-    }
-
-    public void reload(){
-        this.chamber = 25;
-        this.allAmmo -= 25;
+//        this.microImageView.setX(this.charCordsX);
+//        this.microImageView.setY(this.charCordsY);
+//        this.microLabel.setTranslateX(this.charCordsX);
+//        this.microLabel.setTranslateY(this.charCordsY);
+        this.microWrapper.setTranslateX(this.charCordsX);
+        this.microWrapper.setTranslateY(this.charCordsY);
     }
 
     public void sayToChild(){
@@ -278,6 +349,7 @@ public class MicroObject implements Comparable<MicroObject>, Cloneable {
     @Override
     public String toString() {
         return "Unit#1: { " +
+                "id: " + id +
                 "site: " + characterSite +
                 ", hp: " + characterHp +
                 ", lvl: " + characterLevel +

@@ -5,6 +5,9 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.*;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.media.AudioClip;
+import javafx.scene.media.Media;
+import javafx.scene.media.MediaPlayer;
 import javafx.stage.Stage;
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
@@ -20,17 +23,17 @@ import javafx.scene.text.Font;
 import javafx.stage.Stage;
 
 import java.awt.*;
+import java.io.File;
 import java.io.FileNotFoundException;
-import java.util.ArrayList;
-import java.util.Random;
-import java.util.Scanner;
+import java.util.*;
 
 public class Main extends Application {
 
-    public static MacroObjSite[] sites = new MacroObjSite[2];
+    public static  MacroObjSite[] sites = new MacroObjSite[2];
     public static MacroObjSpawn[] spawns = new MacroObjSpawn[2];
-    public static MicroObject[] microObjectsT;
-    public static MicroObject[] microObjectsCT;
+    public static ArrayList<MicroObject> microObjectsT = new ArrayList<MicroObject>();
+//    public static MicroObject[] microObjectsCT;
+    public static ArrayList<MicroObject> microObjectsCT = new ArrayList<MicroObject>();
     public static int teamSize;
 
     static AnimationTimer timer;
@@ -54,6 +57,8 @@ public class Main extends Application {
         SpawnMicros(ctLvls, "ct");
 
 
+
+
 //        for (MicroObject microT : microObjectsT){
 //            System.out.println(microT);
 //        }
@@ -73,7 +78,7 @@ public class Main extends Application {
 //        System.out.println();
 //        System.out.println();
 
-        System.out.println(width + " " + height);
+//        System.out.println(width + " " + height);
 
         Group root = new Group(group);
         scrollPane = new ScrollPane(root);
@@ -91,24 +96,6 @@ public class Main extends Application {
         primaryStage.setTitle("CS clone");
         primaryStage.setScene(scene);
 
-//        scrollPane.setOnMouseClicked(new EventHandler<MouseEvent>() {
-//            @Override
-//            public void handle(MouseEvent event)
-//            {
-////                System.out.println(Main.scrollPane.);
-//
-//                System.out.println("x: " + event.getX() + " y: " + event.getY());
-////                 check micro coords
-//                for (int i = 0; i < Main.teamSize; i++){
-//                    Main.microObjectsT[i].checkActivate(event.getX(), event.getY());
-//                    Main.microObjectsCT[i].checkActivate(event.getX(), event.getY());
-////                    System.out.println("t: " + Main.microObjectsT[i] + ", ct: " + Main.microObjectsCT[i]);
-//                }
-//
-////                wolf.mouseActivate( event.getX(), event.getY() );
-//            }
-//        });
-
         scene.setOnKeyPressed(new KeyPressHandler());
 
         primaryStage.setTitle("Hello World");
@@ -118,6 +105,12 @@ public class Main extends Application {
             @Override
             public void handle(long now) {
                 Main.MoveMicro();
+                Main.checkIntersectsMacro();
+                try {
+                    Main.checkIntersectsMicro();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
             }
         };
 
@@ -174,70 +167,96 @@ public class Main extends Application {
 
     static void SpawnMicros(ArrayList<String> lvls, String side) throws FileNotFoundException {
         if(side.equals("ct")){
-            Main.microObjectsCT = new MicroObject[Main.teamSize];
-            int iteratorCT = 0;
             for(String lvl : lvls){
                 if(lvl.equals("First level")){
-                    Main.microObjectsCT[iteratorCT] = new MicroObject("ct");
+                    Main.microObjectsCT.add(new MicroObject("ct"));
                 }else if(lvl.equals("Second level")){
-                    Main.microObjectsCT[iteratorCT] = new MicroObjectOne("ct");
+                    Main.microObjectsCT.add(new MicroObjectOne("ct"));
                 }else if(lvl.equals("Third level")){
-                    Main.microObjectsCT[iteratorCT] = new MicroObjectTwo("ct");
+                    Main.microObjectsCT.add(new MicroObjectTwo("ct"));
                 }
-                iteratorCT++;
             }
             for (MicroObject micro : Main.microObjectsCT){
                 group.getChildren().add(micro.microGroup);
             }
         }else if(side.equals("t")){
-            Main.microObjectsT = new MicroObject[Main.teamSize];
-            int iteratorT = 0;
             for(String lvl : lvls){
                 if(lvl.equals("First level")){
-                    Main.microObjectsT[iteratorT] = new MicroObject("t");
+                    Main.microObjectsT.add(new MicroObject("t"));
                 }else if(lvl.equals("Second level")){
-                    Main.microObjectsT[iteratorT] = new MicroObjectOne("t");
+                    Main.microObjectsT.add(new MicroObjectOne("t"));
                 }else if(lvl.equals("Third level")){
-                    Main.microObjectsT[iteratorT] = new MicroObjectTwo("t");
+                    Main.microObjectsT.add(new MicroObjectTwo("t"));
                 }
-                iteratorT++;
             }
             for (MicroObject micro : Main.microObjectsT){
                 group.getChildren().add(micro.microGroup);
             }
         }
+    }
 
-//        for(int i = 0; i < Main.microObjectsCT.length; i++){
-//            if(lvl.equals("First level")){
-//                Main.microObjectsCT[i] = new MicroObject("ct");
-//            }else if(lvl.equals("Second level")){
-//                Main.microObjectsCT[i] = new MicroObjectOne("ct");
-//            }else if(lvl.equals("Third level")){
-//                Main.microObjectsCT[i] = new MicroObjectTwo("ct");
-//            }
-//        }
-//
-//        for(int i = 0; i < Main.microObjectsT.length; i++){
-//            if(lvl.equals("First level")){
-//                Main.microObjectsCT[i] = new MicroObject("t");
-//            }else if(lvl.equals("Second level")){
-//                Main.microObjectsCT[i] = new MicroObjectOne("t");
-//            }else if(lvl.equals("Third level")){
-//                Main.microObjectsCT[i] = new MicroObjectTwo("t");
-//            }
-//        }
+    static long lastInvocationT = new Date().getTime();
+    static long lastInvocationCT = new Date().getTime();
+    static long interval = 250;
 
+    public static void checkIntersectsMicro() throws InterruptedException {
+        ArrayList<MicroObject> microsToDelete = new ArrayList<MicroObject>();
+        for(MicroObject microCT : Main.microObjectsCT){
+            for(MicroObject microT : Main.microObjectsT){
+                if(microCT.microGroup.intersects(microT.microGroup.getLayoutBounds())){
+                    long current = new Date().getTime();
+                    if(!((current - lastInvocationT) < interval)){
+                        microT.interactWith(microCT);
+                        microCT.interactWith(microT);
+                        AudioClip shoot = new AudioClip(new File("src/audio/ak_shoot.mp3").toURI().toString());
+                        shoot.play();
+                        microT.microLabel.setText("Lvl: " + microT.getLvl() + ", hp: "  + microT.getHp());
+                        microCT.microLabel.setText("Lvl: " + microCT.getLvl() + ", hp: "  + microCT.getHp());
+                    }
+                    lastInvocationT = current;
+                    lastInvocationCT = current;
+                }
 
+                if(!microT.getAlive()){
+                    Main.group.getChildren().remove(microT.microGroup);
+                    microsToDelete.add(microT);
+                }else if(!microCT.getAlive()){
+                    Main.group.getChildren().remove(microCT.microGroup);
+                    microsToDelete.add(microCT);
+                }
+            }
+        }
+        for(MicroObject delete : microsToDelete){
+            if(delete.getSide().equals("t")){
+                Main.microObjectsT.remove(delete);
+            }else{
+                Main.microObjectsCT.remove(delete);
+            }
+        }
+    }
 
+    public static void checkIntersectsMacro(){
 
+        for(MacroObjSite site : Main.sites){
+            for(MicroObject micro : Main.microObjectsCT){
+                if(site.siteGroup.intersects(micro.microGroup.getLayoutBounds())){
+                    //if bomb planted stop and defuse it
+                    micro.changeInMacro(true);
+                }else{
+                    micro.changeInMacro(false);
+                }
+            }
 
-//        for (MicroObject m : Main.microObjectsCT){
-//            System.out.println(m + "\n");
-//        }
-//
-//        for (MicroObject m : Main.microObjectsT){
-//            System.out.println(m + "\n");
-//        }
+            for(MicroObject micro : Main.microObjectsT){
+                if(site.siteGroup.intersects(micro.microGroup.getLayoutBounds())){
+                    //stop to set bomb
+                    micro.changeInMacro(true);
+                }else{
+                    micro.changeInMacro(false);
+                }
+            }
+        }
+
     }
 
 

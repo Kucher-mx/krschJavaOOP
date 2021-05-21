@@ -30,7 +30,7 @@ public class MicroObjectOne extends MicroObject{
     public MicroObjectOne(String side) throws FileNotFoundException {
         super(side);
         this.setLvl(2);
-        this.setDamage(25);
+        this.setDamage(7);
         this.setKevlar(75);
 
         this.staminaRegenKoef = 0.7;
@@ -38,29 +38,21 @@ public class MicroObjectOne extends MicroObject{
         this.staminaWasteKoef = 1;
 
         this.microLabel = new Label("Lvl: 2, hp: "  + this.getHp());
+        this.microLabel.setStyle("-fx-text-inner-color: white;");
         if(side.equals("t")){
             microImage = new Image(new FileInputStream("src/source/t_2.png"));
             this.microImageView = new ImageView(microImage);
 
             this.microWrapper.setTranslateX(this.getX());
             this.microWrapper.setTranslateY(this.getY());
-
-//            this.microImageView.setX(MicroObject.coordsTX);
-//            this.microImageView.setY(MicroObject.coordsTY);
-//            this.microLabel.setTranslateX(MicroObject.coordsTX);
-//            this.microLabel.setTranslateY(MicroObject.coordsTY - 25.0);
         }else{
             microImage = new Image(new FileInputStream("src/source/ct_2.png"));
             this.microImageView = new ImageView(microImage);
 
             this.microWrapper.setTranslateX(this.getX());
             this.microWrapper.setTranslateY(this.getY());
-
-//            this.microImageView.setX(MicroObject.coordsCTX);
-//            this.microImageView.setY(MicroObject.coordsCTY);
-//            this.microLabel.setTranslateX(MicroObject.coordsCTX);
-//            this.microLabel.setTranslateY(MicroObject.coordsCTY - 25.0);
         }
+        this.microLabel.setStyle("-fx-border-color: white;" + "-fx-text-inner-color: white;");
         this.microImageView.setPreserveRatio(true);
         this.microImageView.setFitHeight(120.0);
         this.microImageView.setFitWidth(90.0);

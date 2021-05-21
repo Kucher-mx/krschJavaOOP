@@ -20,6 +20,10 @@ public class MacroObjSite {
     Rectangle rectangle;
     protected Group siteGroup;
 
+    public String getName(){
+        return this.name;
+    }
+
     public MicroObject get(Queue<MicroObject> obj, int idx){
         MicroObject element = null;
         int size = obj.size();

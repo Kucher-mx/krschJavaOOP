@@ -77,7 +77,6 @@ public class Main extends Application {
         miniMapScale.setX(0.1);
         miniMapScale.setY(0.1);
 
-//        miniMapGroupWrap.getChildren().add(scrollPane);
         miniMapGroupWrap.getChildren().add(miniMapGroup);
 
         layout.setCenter(scrollPane);
@@ -136,6 +135,11 @@ public class Main extends Application {
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
+
+//                for(MicroObject unit : Main.microObjectsCT){
+//                    System.out.println(unit);
+//                }
+//                System.out.println();
             }
         };
 
@@ -192,8 +196,6 @@ public class Main extends Application {
         Main.primaryStage = primaryStage;
         Main.setSetupStage();
         primaryStage.show();
-
-
     }
 
     public static void SpawnWallpaper() throws FileNotFoundException {

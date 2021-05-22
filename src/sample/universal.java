@@ -15,6 +15,9 @@ public class universal {
     LinkedList sites  = new LinkedList();
 
     public universal() throws FileNotFoundException {
+
+
+
         System.out.print("size of the teams: ");
         teamSize = in.nextInt();
 

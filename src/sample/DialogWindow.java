@@ -35,7 +35,6 @@ public class DialogWindow {
     private GridPane pane;
 
     public DialogWindow(){
-        HBox subPane = new HBox();
         dialogGroup = new Group();
         pane = new GridPane();
 
@@ -52,7 +51,7 @@ public class DialogWindow {
         pane.getRowConstraints().add(new RowConstraints(100));
 
         GridPane.setHalignment(button, HPos.CENTER);
-        pane.setGridLinesVisible(true);
+//        pane.setGridLinesVisible(true);
 
         button.setOnAction(new EventHandler<ActionEvent>() {
 

@@ -328,7 +328,8 @@ public class MicroObject implements Comparable<MicroObject>, Cloneable {
     public boolean equals(Object obj) {
 //        if (obj == null || getClass() != obj.getClass()) return false;
         MicroObject character = (MicroObject) obj;
-        return ((this.getLvl() == (character.getLvl())) && (this.getHp() == character.getHp()));
+        return this.id == character.id;
+//        return ((this.getLvl() == (character.getLvl())) && (this.getHp() == character.getHp()));
     }
 
     @Override

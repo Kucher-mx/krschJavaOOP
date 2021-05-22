@@ -1,13 +1,19 @@
 package sample;
 
 import javafx.application.Application;
-import javafx.fxml.FXMLLoader;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
+import javafx.geometry.Insets;
 import javafx.scene.*;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.image.WritableImage;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.input.ScrollEvent;
+import javafx.scene.layout.FlowPane;
 import javafx.scene.media.AudioClip;
-import javafx.scene.media.Media;
-import javafx.scene.media.MediaPlayer;
+import javafx.scene.transform.Scale;
 import javafx.stage.Stage;
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
@@ -26,13 +32,13 @@ import java.awt.*;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.*;
+import javafx.scene.shape.Rectangle;
 
 public class Main extends Application {
 
     public static  MacroObjSite[] sites = new MacroObjSite[2];
     public static MacroObjSpawn[] spawns = new MacroObjSpawn[2];
     public static ArrayList<MicroObject> microObjectsT = new ArrayList<MicroObject>();
-//    public static MicroObject[] microObjectsCT;
     public static ArrayList<MicroObject> microObjectsCT = new ArrayList<MicroObject>();
     public static int teamSize;
 
@@ -45,40 +51,17 @@ public class Main extends Application {
     public static ScrollPane scrollPane;
     public static Stage primaryStage;
     final static Random random = new Random();
-    //get screen size to render appropriate window
-    Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-    double  width = screenSize.getWidth();
-    double height = screenSize.getHeight();
+    static ImageView miniMapView;
+    static Group miniMapGroup = new Group();
+    static Scale miniMapScale = new Scale();
+    static Group miniMapGroupWrap = new Group();
+    static Rectangle miniMapBoxView = new Rectangle();
 
     public static void setMainStage(double width, double height, ArrayList<String> ctLvls, ArrayList<String> tLvls) throws FileNotFoundException {
         SpawnWallpaper();
         SpawnMacros();
         SpawnMicros(tLvls, "t");
         SpawnMicros(ctLvls, "ct");
-
-
-
-
-//        for (MicroObject microT : microObjectsT){
-//            System.out.println(microT);
-//        }
-//
-//        for (MicroObject microCt : microObjectsCT){
-//            System.out.println(microCt);
-//        }
-
-//        System.out.println();
-//        System.out.println();
-//        System.out.println();
-//
-//        for (int i = 0; i < Main.teamSize; i++){
-//            System.out.println("t: " + Main.microObjectsT[i] + ", ct: " + Main.microObjectsCT[i]);
-//        }
-//        System.out.println();
-//        System.out.println();
-//        System.out.println();
-
-//        System.out.println(width + " " + height);
 
         Group root = new Group(group);
         scrollPane = new ScrollPane(root);
@@ -90,16 +73,58 @@ public class Main extends Application {
         scrollPane.setFitToWidth(true);
 
         layout = new BorderPane();
+
+        miniMapScale.setX(0.1);
+        miniMapScale.setY(0.1);
+
+//        miniMapGroupWrap.getChildren().add(scrollPane);
+        miniMapGroupWrap.getChildren().add(miniMapGroup);
+
         layout.setCenter(scrollPane);
+        layout.setRight(miniMapGroup);
 
         scene = new Scene(layout, width, height);
         primaryStage.setTitle("CS clone");
         primaryStage.setScene(scene);
-
+        actualizeMiniMap();
         scene.setOnKeyPressed(new KeyPressHandler());
 
-        primaryStage.setTitle("Hello World");
+        primaryStage.setTitle("CS Clone");
         primaryStage.setScene(scene);
+
+        miniMapGroup.setOnMousePressed(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                double x = event.getX();
+                double y = event.getY();
+
+                miniMapBoxView.setX(x);
+                miniMapBoxView.setY(y);
+
+                System.out.println(x + ",y: " + y);
+                System.out.println(miniMapBoxView.getX() + ",y: " + miniMapBoxView.getY());
+
+                double posX = ( (x - 840) / (3700*0.1) * 3700);
+                double posY = ( (y) / (3000*0.1) * 3000);
+                scrollPane.setVvalue(posY / 2700);
+                scrollPane.setHvalue(posX / 3200);
+            }
+        });
+
+
+        scrollPane.vvalueProperty().addListener(new ChangeListener<Number>() {
+            @Override
+            public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
+                miniMapBoxView.setY(scrollPane.getVvalue() * 300);
+            }
+        });
+
+        scrollPane.hvalueProperty().addListener(new ChangeListener<Number>() {
+            @Override
+            public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
+                miniMapBoxView.setX(scrollPane.getHvalue() * 370 + 835);
+            }
+        });
 
         timer = new AnimationTimer() {
             @Override
@@ -123,11 +148,52 @@ public class Main extends Application {
         Main.primaryStage.setScene(dialogWindow.returnDialogScene());
     }
 
+
+    public static void updateMiniMap(){
+        miniMapGroup.getChildren().clear();
+
+        WritableImage SNAPSHOT = Main.group.snapshot(new SnapshotParameters(), null);
+
+        miniMapBoxView.setX(miniMapBoxView.getX());
+        miniMapBoxView.setY(miniMapBoxView.getY());
+        miniMapBoxView.setHeight(5);
+        miniMapBoxView.setWidth(5);
+        miniMapBoxView.setFill(Color.WHITE);
+        miniMapBoxView.setStroke(Color.NAVAJOWHITE);
+
+        miniMapView = new ImageView(SNAPSHOT);
+        miniMapGroup.getChildren().add(miniMapView);
+        miniMapGroup.getChildren().add(miniMapBoxView);
+
+        miniMapView.setLayoutX(scene.getWidth() - 600);
+        miniMapView.setLayoutY(0);
+        miniMapView.getTransforms().add(miniMapScale);
+    }
+    public static void actualizeMiniMap() {
+        WritableImage SNAPSHOT = Main.group.snapshot(new SnapshotParameters(), null);
+
+        miniMapBoxView.setX(scene.getWidth() - 600);
+        miniMapBoxView.setY(0);
+        miniMapBoxView.setHeight(5);
+        miniMapBoxView.setWidth(5);
+        miniMapBoxView.setFill(Color.WHITE);
+        miniMapBoxView.setStroke(Color.NAVAJOWHITE);
+        miniMapView = new ImageView(SNAPSHOT);
+        miniMapGroup.getChildren().add(miniMapView);
+        miniMapGroup.getChildren().add(miniMapBoxView);
+
+        miniMapView.setLayoutX(scene.getWidth() - 600);
+        miniMapView.setLayoutY(0);
+        miniMapView.getTransforms().add(miniMapScale);
+    }
+
     @Override
     public void start(Stage primaryStage) throws Exception{
         Main.primaryStage = primaryStage;
         Main.setSetupStage();
         primaryStage.show();
+
+
     }
 
     public static void SpawnWallpaper() throws FileNotFoundException {
@@ -206,6 +272,7 @@ public class Main extends Application {
                 if(microCT.microGroup.intersects(microT.microGroup.getLayoutBounds())){
                     long current = new Date().getTime();
                     if(!((current - lastInvocationT) < interval)){
+                        updateMiniMap();
                         microT.interactWith(microCT);
                         microCT.interactWith(microT);
                         AudioClip shoot = new AudioClip(new File("src/audio/ak_shoot.mp3").toURI().toString());
@@ -236,7 +303,6 @@ public class Main extends Application {
     }
 
     public static void checkIntersectsMacro(){
-
         for(MacroObjSite site : Main.sites){
             for(MicroObject micro : Main.microObjectsCT){
                 if(site.siteGroup.intersects(micro.microGroup.getLayoutBounds())){

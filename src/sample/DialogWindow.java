@@ -61,7 +61,6 @@ public class DialogWindow {
                 if (textField.getText() != null){
                     int sizeOfTheTeam = Integer.parseInt(textField.getText());
                     Main.teamSize = sizeOfTheTeam;
-                    System.out.println("teamSize dialog: " + Main.teamSize);
 
                     pane.getChildren().clear();
                     while(pane.getRowConstraints().size() > 0){
@@ -113,7 +112,6 @@ public class DialogWindow {
                                 Integer row = GridPane.getRowIndex(child);
                                 if ((column != null && row != null) && (row == 1 || row == 3)) {
                                     ChoiceBox node = (ChoiceBox)child;
-                                    System.out.println("type of value" + node.getValue() + " id: " + node.getId());
                                     if(node.getId().equals("ct")){
                                         ctLvls.add((String) node.getValue());
                                     }else if(node.getId().equals("t")){
@@ -122,24 +120,10 @@ public class DialogWindow {
                                 }
                             }
 
-//                            try {
-//                                Main.SpawnMicros(ctLvls, "ct");
-//                                Main.SpawnMicros(tLvls, "t");
-//                            } catch (FileNotFoundException fileNotFoundException) {
-//                                fileNotFoundException.printStackTrace();
-//                            }
-
-//                            for (String el : ctLvls){
-//                                System.out.println("ct: " + el);
-//                            }
-//
-//                            for (String el : tLvls){
-//                                System.out.println("t: " + el);
-//                            }
-
                             Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
                             double  width = screenSize.getWidth();
                             double height = screenSize.getHeight();
+                            System.out.println(width + " " + height);
                             try {
                                 Main.setMainStage(width, height, ctLvls, tLvls);
                             } catch (FileNotFoundException fileNotFoundException) {

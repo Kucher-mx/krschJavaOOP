@@ -201,6 +201,28 @@ public class MicroObject implements Comparable<MicroObject>, Cloneable {
         MicroObject.idCounter++;
     }
 
+    public void interactInMacro(MicroObject enemy){
+        if(!(enemy.getHp() <= 7)){
+            enemy.getDamage(this);
+        }else{
+            enemy.changeAlive();
+        }
+
+        if(!(this.getHp() <= 7)){
+            this.getDamage(enemy);
+        }else{
+            this.changeAlive();
+        }
+
+//        if(this.getHp() <= 7){
+//            this.changeAlive();
+//        }
+//
+//        if(enemy.getHp() <= 7){
+//            enemy.changeAlive();
+//        }
+    }
+
     public void print(){
         System.out.println("Object's site: " + this.characterSite +
                 " his HP and Armour: " + this.characterHp + ", " + this.characterKevlar +

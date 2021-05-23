@@ -3,15 +3,21 @@ package sample;
 import javafx.application.Application;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.event.ActionEvent;
+import javafx.geometry.HPos;
 import javafx.geometry.Insets;
+import javafx.geometry.VPos;
 import javafx.scene.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.Dialog;
+import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.WritableImage;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
-import javafx.scene.layout.FlowPane;
+import javafx.scene.layout.*;
 import javafx.scene.media.AudioClip;
 import javafx.scene.transform.Scale;
 import javafx.stage.Stage;
@@ -23,7 +29,6 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.layout.BorderPane;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
@@ -31,16 +36,18 @@ import javafx.stage.Stage;
 import java.awt.*;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.*;
 import javafx.scene.shape.Rectangle;
 
 public class Main extends Application {
 
-    public static  MacroObjSite[] sites = new MacroObjSite[2];
+    public static MacroObjSite[] sites = new MacroObjSite[2];
     public static MacroObjSpawn[] spawns = new MacroObjSpawn[2];
     public static ArrayList<MicroObject> microObjectsT = new ArrayList<MicroObject>();
     public static ArrayList<MicroObject> microObjectsCT = new ArrayList<MicroObject>();
     public static int teamSize;
+    public static boolean endOfTheGame = false;
 
     static AnimationTimer timer;
     static Group group = new Group();
@@ -128,18 +135,30 @@ public class Main extends Application {
         timer = new AnimationTimer() {
             @Override
             public void handle(long now) {
-                Main.MoveMicro();
-                Main.checkIntersectsMacro();
-                try {
-                    Main.checkIntersectsMicro();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
+                if(!endOfTheGame){
+                    Main.MoveMicro();
+                    Main.checkIntersectsMacro();
+                    try {
+                        Main.checkIntersectsMicro();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
 
-//                for(MicroObject unit : Main.microObjectsCT){
-//                    System.out.println(unit);
-//                }
-//                System.out.println();
+
+                    if(sites[1].ct.size() > 0){
+                        checkGetMacro(sites[1], "ct");
+                    }else if(sites[1].t.size() > 0){
+                        checkGetMacro(sites[1], "t");
+                    }
+
+                    if(sites[0].ct.size() > 0){
+                        checkGetMacro(sites[0], "ct");
+                    }else if(sites[0].t.size() > 0){
+                        checkGetMacro(sites[0], "t");
+                    }
+
+                    checkWin();
+                }
             }
         };
 
@@ -305,10 +324,14 @@ public class Main extends Application {
     }
 
     public static void checkIntersectsMacro(){
+        ArrayList<MicroObject> microsToRemove = new ArrayList<MicroObject>();
         for(MacroObjSite site : Main.sites){
             for(MicroObject micro : Main.microObjectsCT){
-                if(site.siteGroup.intersects(micro.microGroup.getLayoutBounds())){
-                    //if bomb planted stop and defuse it
+                if(site.siteGroup.intersects(micro.microGroup.getLayoutBounds()) && !site.getBelong().equals("ct")){
+                    site.addCt(micro);
+                    Main.group.getChildren().remove(micro.microGroup);
+                    checkGetMacro(site, "ct");
+                    microsToRemove.add(micro);
                     micro.changeInMacro(true);
                 }else{
                     micro.changeInMacro(false);
@@ -316,8 +339,11 @@ public class Main extends Application {
             }
 
             for(MicroObject micro : Main.microObjectsT){
-                if(site.siteGroup.intersects(micro.microGroup.getLayoutBounds())){
-                    //stop to set bomb
+                if(site.siteGroup.intersects(micro.microGroup.getLayoutBounds()) && !site.getBelong().equals("t")){
+                    site.addT(micro);
+                    Main.group.getChildren().remove(micro.microGroup);
+                    checkGetMacro(site, "t");
+                    microsToRemove.add(micro);
                     micro.changeInMacro(true);
                 }else{
                     micro.changeInMacro(false);
@@ -325,61 +351,132 @@ public class Main extends Application {
             }
         }
 
+        for(MicroObject delete : microsToRemove){
+            if(delete.getSide().equals("t")){
+                Main.microObjectsT.remove(delete);
+            }else{
+                Main.microObjectsCT.remove(delete);
+            }
+        }
     }
 
+    public static void checkWin(){
+        Dialog<Boolean> dialog = new Dialog<>();
+        dialog.setTitle("Game Over");
+        Button restart = new Button("Restart");
+        Label gameOverLabel = new Label();
+        GridPane endGrid = new GridPane();
+        Boolean won = false;
+
+        endGrid.getRowConstraints().add(new RowConstraints(50));
+        endGrid.getRowConstraints().add(new RowConstraints(50));
+
+        endGrid.getColumnConstraints().add(new ColumnConstraints(200));
 
 
-//    public static void main(String[] args) {
-//        launch(args);
-//
-//        universal mainObj = new universal();
-//        Scanner in = new Scanner(System.in);
-//        int choice = 1;
-//        while(choice != 0) {
-//            System.out.println();
-//            System.out.println("""
-//                    Enter action you wanna do:\s
-//                    1: Add an microObject\s
-//                    2: Print all teams\s
-//                    3: Interaction of the micro you choose\s
-//                    4: Interaction of the two sites A&B\s
-//                    5: Count the micro based on characteristics you choose\s
-//                    6: Delete a micro from the team you choose\s
-//                    7: Call base method:)\s
-//                    0: Exit""");
-//            choice = in.nextInt();
-//            System.out.println();
-//            switch (choice){
-//                case 1:
-//                    mainObj.addMicroObj();
-//                    break;
-//                case 2:
-//                    mainObj.printAll();
-//                    break;
-//                case 3:
-//                    mainObj.interactWithMicro();
-//                    break;
-//                case 4:
-//                    mainObj.InteractInMacro();
-//                    break;
-//                case 5:
-//                    mainObj.countMicro();
-//                    break;
-//                case 6:
-//                    mainObj.deleteMicro();
-//                    break;
-//                case 7:
-//                    MicroObject first = new MicroObject("t");
-//                    MicroObjectOne second = new MicroObjectOne("t");
-//
-//                    if(mainObj.callBase(first)){
-//                        mainObj.callBase(second);
-//                    }
-//                    break;
-//                default:
-//                    System.out.println("You have chosen the wrong one");
-//                    break;
-//            }
-//        }
-//    }
+        if(sites[0].getBelong().equals("ct") && sites[0].getBelong().equals("ct")){
+            System.out.println("ct won");
+            gameOverLabel.setText("ct won by sites");
+            won = true;
+        }
+
+        if(sites[0].getBelong().equals("t") && sites[0].getBelong().equals("t")){
+            System.out.println("t won");
+            gameOverLabel.setText("t won by sites");
+            won = true;
+        }
+
+        if(microObjectsCT.size() == 0 && microObjectsT.size() > 0 && (sites[0].ct.size() == 0 && sites[1].ct.size() == 0)){
+            System.out.println("t won by quantity");
+            gameOverLabel.setText("t won by quantity");
+            won = true;
+        }
+
+        if(microObjectsT.size() == 0 && microObjectsCT.size() > 0 && (sites[0].t.size() == 0 && sites[1].t.size() == 0)){
+            System.out.println("ct won by quantity");
+            gameOverLabel.setText("ct won by quantity");
+            won = true;
+        }
+
+        endGrid.setHalignment(gameOverLabel, HPos.CENTER);
+        endGrid.setValignment(gameOverLabel, VPos.CENTER);
+        endGrid.setHalignment(restart, HPos.CENTER);
+        endGrid.setValignment(restart, VPos.CENTER);
+
+        dialog.getDialogPane().setPrefSize(320, 250);
+        endGrid.setStyle("-fx-padding: 110px 0 0 40px;");
+        endGrid.setGridLinesVisible(true);
+
+        if(won){
+            endGrid.add(gameOverLabel, 0, 0);
+            endGrid.add(restart, 0, 1);
+
+            restart.setOnAction(new EventHandler<ActionEvent>() {
+                @Override
+                public void handle(ActionEvent actionEvent) {
+//                    microObjectsCT.clear();
+//                    microObjectsT.clear();
+//                    Main.setSetupStage();
+//                    Main.group.getChildren().clear();
+//                    Main.miniMapGroup.getChildren().clear();
+                    dialog.setResult(Boolean.TRUE);
+                    System.exit(0);
+                }
+            });
+
+            dialog.getDialogPane().getChildren().add(endGrid);
+            endOfTheGame = true;
+            dialog.show();
+        }
+    }
+
+    public static void checkGetMacro(MacroObjSite site, String side){
+        if(side.equals("ct")){
+            if(!(site.getBelong().equals("ct"))){
+                if(site.t.size() > 0){
+                    String battleRes = site.fightToGet();
+                    if(battleRes.equals("ct")){
+                        if(site.timeStartedCT == 0){
+                            site.timeStartedCT = new Date().getTime();
+                        }
+                        site.getMacro("ct");
+                    }
+                }else{
+                    if(site.timeStartedCT == 0){
+                        site.timeStartedCT = new Date().getTime();
+                    }
+                    site.getMacro("ct");
+                }
+            }else if(site.getBelong().equals("none")){
+                if(site.timeStartedCT == 0){
+                    site.timeStartedCT = new Date().getTime();
+                }
+                site.getMacro("ct");
+            }
+        }
+
+        if(side.equals("t")){
+            if(!(site.getBelong().equals("t"))){
+                if(site.ct.size() > 0){
+                    String battleRes = site.fightToGet();
+                    if(battleRes.equals("t")){
+                        if(site.timeStartedT == 0){
+                            site.timeStartedT = new Date().getTime();
+                        }
+                        site.getMacro("t");
+                    }
+                }else{
+                    if(site.timeStartedT == 0){
+                        site.timeStartedT = new Date().getTime();
+                    }
+                    site.getMacro("t");
+                }
+            }else if(site.getBelong().equals("none")){
+                if(site.timeStartedT == 0){
+                    site.timeStartedT = new Date().getTime();
+                }
+                site.getMacro("t");
+            }
+        }
+    }
 }

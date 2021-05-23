@@ -116,8 +116,6 @@ public class KeyPressHandler implements EventHandler<KeyEvent>{
             dialogPane.setHgap(10);
             dialogPane.setVgap(12);
 
-            dialogPane.setGridLinesVisible(true);
-
             dialog.getDialogPane().setPrefSize(400, 250);
             dialog.getDialogPane().getChildren().add(dialogPane);
 
@@ -159,9 +157,6 @@ public class KeyPressHandler implements EventHandler<KeyEvent>{
             });
 
             dialog.show();
-
-
-            // spawn micro
         }
 
         if (event.getCode().equals(KeyCode.R)){

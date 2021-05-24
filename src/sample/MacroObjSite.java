@@ -95,8 +95,7 @@ public class MacroObjSite {
 
     public void getMacro(String side) throws FileNotFoundException {
         if(side.equals("ct")){
-//            System.out.println(timeStartedCT);
-            if(timeStartedCT + 10000 <= new Date().getTime()){
+            if(timeStartedCT + Main.timeToCapture <= new Date().getTime()){
                 this.setBelong("ct");
                 this.siteLabel.setText("Site" + this.getName() + ", belongs to: " + belongs);
 
@@ -112,17 +111,18 @@ public class MacroObjSite {
                     MicroObject unitCT = (MicroObject) ctIterator.next();
                     unitCT.setXCoord(0);
                     unitCT.setYCoord(0);
+                    unitCT.setSpeed(unitCT.defaultSpeed);
                     unitCT.microWrapper.setStyle(" ");
                     unitCT.changeActive();
                     Main.microObjectsCT.add(unitCT);
                     Main.group.getChildren().add(unitCT.microGroup);
                 }
                 ct.remove(0);
+                Main.toMacro = false;
                 this.timeStartedCT = 0;
             }
         }else if(side.equals("t")){
-//            System.out.println(timeStartedT);
-            if(timeStartedT + 10000 <= new Date().getTime()){
+            if(timeStartedT + Main.timeToCapture <= new Date().getTime()){
                 this.setBelong("t");
                 this.siteLabel.setText("Site" + this.getName() + ", belongs to: " + belongs);
 
@@ -140,15 +140,18 @@ public class MacroObjSite {
                     unitT.microWrapper.setStyle(" ");
                     unitT.changeActive();
                     unitT.setXCoord(0);
+                    unitT.setSpeed(unitT.defaultSpeed);
                     unitT.setYCoord(0);
                     System.out.println(unitT);
                     Main.microObjectsT.add(unitT);
                     Main.group.getChildren().add(unitT.microGroup);
                 }
                 t.remove(0);
+                Main.toMacro = false;
                 this.timeStartedT = 0;
             }
         }
+        Main.timeToCapture = 10000;
     }
 
     public MacroObjSite(String name) throws FileNotFoundException {
@@ -169,7 +172,6 @@ public class MacroObjSite {
             siteLabel.setText("Site A, belongs to: " + belongs);
             siteImage = new Image(new FileInputStream("src/source/a_site.png"));
             siteImageView = new ImageView(siteImage);
-//            imgWrap.getChildren().add(siteImageView);
             siteWrapper.setTranslateX(x);
             siteWrapper.setTranslateY(y);
             siteImageView.setPreserveRatio(true);
@@ -200,7 +202,6 @@ public class MacroObjSite {
             siteImageView.setPreserveRatio(true);
             siteImageView.setFitWidth(90);
             siteImageView.setFitHeight(90);
-//            imgWrap.getChildren().add(siteImageView);
             siteWrapper.setTranslateX(x);
             siteWrapper.setTranslateY(y);
             siteWrapper.setHalignment(siteLabel, HPos.CENTER);
@@ -213,8 +214,6 @@ public class MacroObjSite {
             siteWrapper.setStyle("-fx-background-color: gray");
             siteWrapper.setOpacity(0.8);
         }
-//        rectangle.setFill(Color.GRAY);
-//        rectangle.setOpacity(0.5);
         siteLabel.setStyle("-fx-border-style: solid inside;" +
                 "-fx-border-width: 2;" +
                 "-fx-border-insets: 5;" +

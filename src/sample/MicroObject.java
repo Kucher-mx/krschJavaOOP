@@ -43,6 +43,7 @@ public class MicroObject implements Comparable<MicroObject>, Cloneable {
     private double destinationX;
     private double destinationY;
     public int id;
+    public double defaultSpeed;
 
 //    protected VBox microWrapper = new VBox();
     protected GridPane microWrapper = new GridPane();
@@ -60,8 +61,9 @@ public class MicroObject implements Comparable<MicroObject>, Cloneable {
     public int getHp(){
         return this.characterHp;
     }
-    public void setHp(int newHp){
-        this.characterHp = newHp;
+
+    public void setSpeed(double newSpeed){
+        this.characterSpeed = newSpeed;
     }
 
     public double getSpeed(){
@@ -82,10 +84,6 @@ public class MicroObject implements Comparable<MicroObject>, Cloneable {
 
     public boolean getAlive(){
         return this.alive;
-    }
-
-    public void setSide(String newSide){
-        this.characterSite = newSide;
     }
 
     public int getKevlar(){
@@ -120,6 +118,22 @@ public class MicroObject implements Comparable<MicroObject>, Cloneable {
         this.charCordsY = newY;
     }
 
+    public double getXDest(){
+        return this.destinationX;
+    }
+
+    public void setXCoordDest(double newX){
+        this.destinationX = newX;
+    }
+
+    public double getYDest(){
+        return this.destinationY;
+    }
+
+    public void setYCoordDest(double newY){
+        this.destinationY = newY;
+    }
+
     public void changeActive(){
         this.active = !this.active;
     }
@@ -145,6 +159,7 @@ public class MicroObject implements Comparable<MicroObject>, Cloneable {
         this.characterSite = side;
         this.characterLevel = 1;
         this.characterSpeed = 20;
+        defaultSpeed = 20;
         this.damage = 50;
         this.characterKevlar = 0;
         this.characterHp = 100;
@@ -236,14 +251,6 @@ public class MicroObject implements Comparable<MicroObject>, Cloneable {
         }else{
             this.changeAlive();
         }
-
-//        if(this.getHp() <= 7){
-//            this.changeAlive();
-//        }
-//
-//        if(enemy.getHp() <= 7){
-//            enemy.changeAlive();
-//        }
     }
 
     public void print(){
@@ -295,17 +302,19 @@ public class MicroObject implements Comparable<MicroObject>, Cloneable {
         }
     }
 
-    public void run(){
+    public void run(boolean toMacro){
 
         if(this.getActive() || this.getInMacro()){
             return;
         }
 
-        if(Math.round(this.getX()) == Math.round(this.destinationX)){
+//        System.out.println("run to: x dest: "+ this.destinationX + " y dest: " + this.destinationY);
+
+        if(Math.round(this.getX()) == Math.round(this.destinationX) && !toMacro){
 
             this.destinationX = (double)Main.random.nextInt(3700);
 
-        }else if(Math.round(this.getY()) == Math.round(this.destinationY)){
+        }else if(Math.round(this.getY()) == Math.round(this.destinationY) && !toMacro){
 
             this.destinationY = (double)Main.random.nextInt(3000);
 
@@ -316,17 +325,17 @@ public class MicroObject implements Comparable<MicroObject>, Cloneable {
             if(xDiff < 0){
 
                 if(Math.abs(xDiff) <= this.characterSpeed){
-                    this.setXCoord(this.getX() - (Math.abs(xDiff)/30));
+                    this.setXCoord(this.getX() - (Math.abs(xDiff)/10));
                 }else{
-                    this.setXCoord(this.getX() - (this.characterSpeed/30));
+                    this.setXCoord(this.getX() - (this.characterSpeed/10));
                 }
 
             }else if(xDiff > 0){
 
                 if(xDiff <= this.characterSpeed){
-                    this.setXCoord(this.getX() + (xDiff/30));
+                    this.setXCoord(this.getX() + (xDiff/10));
                 }else{
-                    this.setXCoord(this.getX() + (this.characterSpeed/30));
+                    this.setXCoord(this.getX() + (this.characterSpeed/10));
                 }
 
             }

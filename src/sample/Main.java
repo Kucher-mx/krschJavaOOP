@@ -47,6 +47,8 @@ public class Main extends Application {
     public static ArrayList<MicroObject> microObjectsT = new ArrayList<MicroObject>();
     public static ArrayList<MicroObject> microObjectsCT = new ArrayList<MicroObject>();
     public static int teamSize;
+    static boolean toMacro = false;
+    static int timeToCapture = 10000;
     public static boolean endOfTheGame = false;
 
     static AnimationTimer timer;
@@ -253,11 +255,11 @@ public class Main extends Application {
 
     static void MoveMicro(){
         for (MicroObject micro : Main.microObjectsT){
-            micro.run();
+            micro.run(Main.toMacro);
         }
 
         for (MicroObject micro : Main.microObjectsCT){
-            micro.run();
+            micro.run(Main.toMacro);
         }
     }
 

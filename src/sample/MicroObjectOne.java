@@ -35,6 +35,7 @@ public class MicroObjectOne extends MicroObject{
         super(side);
         this.setLvl(2);
         this.setDamage(7);
+        this.defaultDamage = 7;
         this.setKevlar(75);
 
         this.staminaRegenKoef = 0.7;

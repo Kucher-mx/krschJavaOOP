@@ -201,10 +201,7 @@ public class KeyPressHandler implements EventHandler<KeyEvent>{
 
         if (event.getCode().equals(KeyCode.C)){
             for(MicroObject unit : Main.microObjectsCT){
-                if(unit.getActive()){
-                    unit.changeActive();
                     unit.setSpeed(unit.getSpeed() * 2);
-                    unit.microWrapper.setStyle("");
                     int rndSite = Main.random.nextInt(1);
                     if(rndSite == 0){
                         unit.setXCoordDest(Main.random.nextInt(50) + 2820);
@@ -215,15 +212,11 @@ public class KeyPressHandler implements EventHandler<KeyEvent>{
                     }
                     Main.toMacro = true;
                     Main.timeToCapture = 5000;
-                }
             }
 
             for(MicroObject unit : Main.microObjectsT){
-                if(unit.getActive()){
                     int rndSite = Main.random.nextInt(1);
                     unit.setSpeed(unit.getSpeed() * 1.5);
-                    unit.changeActive();
-                    unit.microWrapper.setStyle("");
                     if(rndSite == 0){
                         unit.setXCoordDest(Main.random.nextInt(50) + 2820);
                         unit.setYCoordDest(Main.random.nextInt(30) + 420);
@@ -234,11 +227,10 @@ public class KeyPressHandler implements EventHandler<KeyEvent>{
                     Main.toMacro = true;
                     Main.timeToCapture = 5000;
                 }
-            }
         }
 
-        if (event.getCode().equals(KeyCode.V)){
-
+        if (event.getCode().equals(KeyCode.B)){
+            Main.berserkPressed = true;
         }
     }
 }

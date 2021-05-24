@@ -20,6 +20,7 @@ public class MicroObjectTwo extends MicroObjectOne{
         super(side);
         this.setLvl(3);
         this.setDamage(9);
+        this.defaultDamage = 9;
         this.setKevlar(100);
 
         this.staminaWasteKoefHp = 1.5;

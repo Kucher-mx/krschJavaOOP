@@ -44,6 +44,7 @@ public class MicroObject implements Comparable<MicroObject>, Cloneable {
     private double destinationY;
     public int id;
     public double defaultSpeed;
+    public int defaultDamage;
 
 //    protected VBox microWrapper = new VBox();
     protected GridPane microWrapper = new GridPane();
@@ -160,7 +161,8 @@ public class MicroObject implements Comparable<MicroObject>, Cloneable {
         this.characterLevel = 1;
         this.characterSpeed = 20;
         defaultSpeed = 20;
-        this.damage = 50;
+        this.damage = 5;
+        this.defaultDamage = 5;
         this.characterKevlar = 0;
         this.characterHp = 100;
         this.id = MicroObject.idCounter;
@@ -325,17 +327,17 @@ public class MicroObject implements Comparable<MicroObject>, Cloneable {
             if(xDiff < 0){
 
                 if(Math.abs(xDiff) <= this.characterSpeed){
-                    this.setXCoord(this.getX() - (Math.abs(xDiff)/10));
+                    this.setXCoord(this.getX() - (Math.abs(xDiff / 10)));
                 }else{
-                    this.setXCoord(this.getX() - (this.characterSpeed/10));
+                    this.setXCoord(this.getX() - (this.characterSpeed / 10));
                 }
 
             }else if(xDiff > 0){
 
                 if(xDiff <= this.characterSpeed){
-                    this.setXCoord(this.getX() + (xDiff/10));
+                    this.setXCoord(this.getX() + (xDiff / 10));
                 }else{
-                    this.setXCoord(this.getX() + (this.characterSpeed/10));
+                    this.setXCoord(this.getX() + (this.characterSpeed / 10));
                 }
 
             }
@@ -343,17 +345,17 @@ public class MicroObject implements Comparable<MicroObject>, Cloneable {
             if(yDiff < 0){
 
                 if(Math.abs(yDiff) <= this.characterSpeed){
-                    this.setYCoord(this.getY() - (Math.abs(yDiff)/10));
+                    this.setYCoord(this.getY() - (Math.abs(yDiff / 10)));
                 }else{
-                    this.setYCoord(this.getY() - (this.characterSpeed/10));
+                    this.setYCoord(this.getY() - (this.characterSpeed / 10));
                 }
 
             }else if(yDiff > 0){
 
                 if(yDiff <= this.characterSpeed){
-                    this.setYCoord(this.getY() + (yDiff/10));
+                    this.setYCoord(this.getY() + (yDiff / 10));
                 }else{
-                    this.setYCoord(this.getY() + (this.characterSpeed/10));
+                    this.setYCoord(this.getY() + (this.characterSpeed / 10));
                 }
 
             }
@@ -393,7 +395,7 @@ public class MicroObject implements Comparable<MicroObject>, Cloneable {
     public String toString() {
         return "Unit#1: { " +
                 "id: " + id +
-                "site: " + characterSite +
+                ", site: " + characterSite +
                 ", hp: " + characterHp +
                 ", lvl: " + characterLevel +
                 ", kevlar: " + characterKevlar +

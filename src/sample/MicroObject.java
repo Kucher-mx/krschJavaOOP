@@ -21,10 +21,7 @@ import java.awt.*;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.*;
 
 public class MicroObject implements Comparable<MicroObject>, Cloneable {
     private String characterSite;
@@ -36,8 +33,9 @@ public class MicroObject implements Comparable<MicroObject>, Cloneable {
     private boolean alive = true;
     private boolean active = false;
     private boolean inMacroSite = false;
+    public long lastHealtTime = 0;
 
-    private int stamina = 100;
+    protected int stamina = 100;
     private double charCordsX;
     private double charCordsY;
     private double destinationX;
@@ -61,6 +59,9 @@ public class MicroObject implements Comparable<MicroObject>, Cloneable {
 
     public int getHp(){
         return this.characterHp;
+    }
+    public void setHp(int newHp){
+        this.characterHp = newHp;
     }
 
     public void setSpeed(double newSpeed){
@@ -264,16 +265,24 @@ public class MicroObject implements Comparable<MicroObject>, Cloneable {
     }
 
     public void run(double x, double y){
-        this.setXCoord(this.getX() + x);
-        this.setYCoord(this.getY() + y);
+        this.setXCoord(this.getX() + this.getSpeed() * x);
+        this.setYCoord(this.getY() + this.getSpeed() * y);
 
-        this.microWrapper.setTranslateX(this.charCordsX);
-        this.microWrapper.setTranslateY(this.charCordsY);
+        this.microWrapper.setTranslateX(this.getX());
+        this.microWrapper.setTranslateY(this.getY());
     }
 
     public String interactWith(MicroObject enemy) {
         if(!(this.getHp() <= 7)){
             this.getDamage(enemy);
+            if(enemy.getLvl() == 3){
+                if(enemy.lastHealtTime == 0){
+                    enemy.lastHealtTime = new Date().getTime();
+                }
+                if((new Date().getTime() - enemy.lastHealtTime) > 250){
+                    enemy.useHealt();
+                }
+            }
         }
 
         if(this.getHp() <= 7){
@@ -283,6 +292,23 @@ public class MicroObject implements Comparable<MicroObject>, Cloneable {
             return "this died";
         }
         return "err";
+    }
+
+    public void useHealt() {
+        System.out.println("in Micro1");
+    }
+
+    public void useRunAbility(double x, double y) {
+        if(stamina > 0){
+            System.out.println("in if");
+            this.setSpeed(this.getSpeed() * 3);
+            this.run(x, y);
+            stamina -= 5;
+        }else{
+            System.out.println("in else");
+            this.setSpeed(this.defaultSpeed);
+            this.run(x, y);
+        }
     }
 
     public void getDamage(MicroObject enemy){
@@ -318,7 +344,7 @@ public class MicroObject implements Comparable<MicroObject>, Cloneable {
 
         }else if(Math.round(this.getY()) == Math.round(this.destinationY) && !toMacro){
 
-            this.destinationY = (double)Main.random.nextInt(3000);
+            this.destinationY = (double)Main.random.nextInt(2850);
 
         }else{
             double xDiff = this.destinationX - this.getX();
@@ -361,10 +387,6 @@ public class MicroObject implements Comparable<MicroObject>, Cloneable {
             }
         }
 
-//        this.microImageView.setX(this.charCordsX);
-//        this.microImageView.setY(this.charCordsY);
-//        this.microLabel.setTranslateX(this.charCordsX);
-//        this.microLabel.setTranslateY(this.charCordsY);
         if(!this.getActive()){
             this.microWrapper.setTranslateX(this.charCordsX);
             this.microWrapper.setTranslateY(this.charCordsY);

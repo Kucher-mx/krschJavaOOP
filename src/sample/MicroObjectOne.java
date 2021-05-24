@@ -97,11 +97,28 @@ public class MicroObjectOne extends MicroObject{
     public void callBaseMethod(){
         super.sayToChild();
     }
+
     public void callBaseMethodWithMsg(){
         System.out.println("Enter your message");
         String msg = in.nextLine();
         super.sayToChild(msg);
     }
+
+    public void useRunAbility(double x, double y) {
+//        if(stamina > 0){
+//            System.out.println(this.getSpeed());
+//            this.setSpeed(this.getSpeed() * 1.5);
+//            System.out.println(this.getSpeed());
+//            this.run(x, y);
+//            stamina -= 5;
+//        }else{
+//            this.setSpeed(this.defaultSpeed);
+//            this.run(x, y);
+//        }
+
+//        System.out.println("in Micro2 run");
+    }
+
     @Override
     public String toString() {
         return "Unit#2: { " +

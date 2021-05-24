@@ -13,8 +13,6 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 
 public class MicroObjectTwo extends MicroObjectOne{
-    private double staminaWasteKoefHp;
-    private double hpKoef;
 
     public MicroObjectTwo(String side) throws FileNotFoundException {
         super(side);
@@ -22,9 +20,6 @@ public class MicroObjectTwo extends MicroObjectOne{
         this.setDamage(9);
         this.defaultDamage = 9;
         this.setKevlar(100);
-
-        this.staminaWasteKoefHp = 1.5;
-        this.hpKoef = 0.5;
 
         this.microLabel = new Label("Lvl: 3, hp: "  + this.getHp());
         this.microLabel.setStyle("-fx-text-inner-color: white;");
@@ -76,6 +71,14 @@ public class MicroObjectTwo extends MicroObjectOne{
         microWrapper.add(this.healthBar, 0, 3);
 
         this.microGroup = new Group(this.microWrapper);
+    }
+
+
+    public void useHealt(){
+        System.out.println("in micro 2");
+        if(this.getHp() <= 95){
+            this.setHp(this.getHp() + 2);
+        }
     }
 
     @Override

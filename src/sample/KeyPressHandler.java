@@ -6,6 +6,8 @@ import javafx.geometry.HPos;
 import javafx.geometry.VPos;
 import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyCodeCombination;
+import javafx.scene.input.KeyCombination;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
@@ -19,24 +21,69 @@ public class KeyPressHandler implements EventHandler<KeyEvent>{
     @Override
     public void handle(KeyEvent event) {
 
+//        for(int i = 0; i < Main.microObjectsCT.size(); i++){
+//            if(Main.microObjectsCT.size() > 0){
+//                if(Main.microObjectsCT.get(i).getActive() && (Main.microObjectsCT.get(i).getLvl() == 2 || Main.microObjectsCT.get(i).getLvl() == 3)){
+//                    if (event.getCode().equals(KeyCode.W) && event.isShiftDown()){
+//                        System.out.println("multy");
+//                        Main.microObjectsT.get(i).useRunAbility(0, -1);
+//                    }
+//
+//                    if (event.getCode().equals(KeyCode.D) && event.isShiftDown()){
+//                        Main.microObjectsT.get(i).useRunAbility(1,0);
+//                    }
+//
+//                    if (event.getCode().equals(KeyCode.S) && event.isShiftDown()){
+//                        Main.microObjectsT.get(i).useRunAbility(0, 1);
+//                    }
+//
+//                    if (event.getCode().equals(KeyCode.A) && event.isShiftDown()){
+//                        Main.microObjectsT.get(i).useRunAbility(-1,0);
+//                    }
+//                }
+//            }
+//        }
+//
+//        for(int i = 0; i < Main.microObjectsT.size(); i++){
+//            if(Main.microObjectsT.size() > 0){
+//                if(Main.microObjectsT.get(i).getActive() && (Main.microObjectsT.get(i).getLvl() == 2 || Main.microObjectsT.get(i).getLvl() == 3)){
+//                    if (event.getCode().equals(KeyCode.W) && event.isShiftDown()){
+//                        Main.microObjectsT.get(i).useRunAbility(0,-1);
+//                    }
+//
+//                    if (event.getCode().equals(KeyCode.D) && event.isShiftDown()){
+//                        Main.microObjectsT.get(i).useRunAbility(1,0);
+//                    }
+//
+//                    if (event.getCode().equals(KeyCode.S) && event.isShiftDown()){
+//                        Main.microObjectsT.get(i).useRunAbility(0, 1);
+//                    }
+//
+//                    if (event.getCode().equals(KeyCode.A) && event.isShiftDown()){
+//                        Main.microObjectsT.get(i).useRunAbility(-1,0);
+//                    }
+//                }
+//            }
+//        }
+
         for(int i = 0; i < Main.microObjectsCT.size(); i++){
             if(Main.microObjectsCT.size() > 0){
                 if(Main.microObjectsCT.get(i).getActive()){
-                    double speed = Main.microObjectsCT.get(i).getSpeed();
-                    if (event.getCode().equals(KeyCode.W)){
-                        Main.microObjectsCT.get(i).run(0,-(speed));
+                    if (event.getCode().equals(KeyCode.W) && !event.isShiftDown()){
+                        System.out.println("only");
+                        Main.microObjectsCT.get(i).run(0,-1);
                     }
 
                     if (event.getCode().equals(KeyCode.D)){
-                        Main.microObjectsCT.get(i).run((speed),0);
+                        Main.microObjectsCT.get(i).run(1,0);
                     }
 
                     if (event.getCode().equals(KeyCode.S)){
-                        Main.microObjectsCT.get(i).run(0,(speed));
+                        Main.microObjectsCT.get(i).run(0,1);
                     }
 
                     if (event.getCode().equals(KeyCode.A)){
-                        Main.microObjectsCT.get(i).run(-(speed),0);
+                        Main.microObjectsCT.get(i).run(-1,0);
                     }
                 }
             }
@@ -47,19 +94,19 @@ public class KeyPressHandler implements EventHandler<KeyEvent>{
                 if(Main.microObjectsT.get(i).getActive()){
                     double speed = Main.microObjectsT.get(i).getSpeed();
                     if (event.getCode().equals(KeyCode.W)){
-                        Main.microObjectsT.get(i).run(0,-(speed));
+                        Main.microObjectsT.get(i).run(0,-1);
                     }
 
                     if (event.getCode().equals(KeyCode.D)){
-                        Main.microObjectsT.get(i).run((speed),0);
+                        Main.microObjectsT.get(i).run(1,0);
                     }
 
                     if (event.getCode().equals(KeyCode.S)){
-                        Main.microObjectsT.get(i).run(0,(speed));
+                        Main.microObjectsT.get(i).run(0,1);
                     }
 
                     if (event.getCode().equals(KeyCode.A)){
-                        Main.microObjectsT.get(i).run(-(speed),0);
+                        Main.microObjectsT.get(i).run(-1,0);
                     }
                 }
             }
@@ -232,5 +279,23 @@ public class KeyPressHandler implements EventHandler<KeyEvent>{
         if (event.getCode().equals(KeyCode.B)){
             Main.berserkPressed = true;
         }
+
+        if (event.getCode().equals(KeyCode.V)){
+            Main.secondLvlAbility = true;
+        }
+
+//        final KeyCombination keyCombinationShiftW = new KeyCodeCombination(
+//                KeyCode.W, KeyCombination.SHIFT_ANY);
+//
+//        final KeyCombination keyCombinationShiftS = new KeyCodeCombination(
+//                KeyCode.S, KeyCombination.SHIFT_ANY);
+//
+//        final KeyCombination keyCombinationShiftA = new KeyCodeCombination(
+//                KeyCode.A, KeyCombination.SHIFT_ANY);
+//
+//        final KeyCombination keyCombinationShiftD = new KeyCodeCombination(
+//                KeyCode.D, KeyCombination.SHIFT_ANY);
+
+
     }
 }

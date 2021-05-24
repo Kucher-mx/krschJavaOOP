@@ -1,47 +1,36 @@
 package sample;
 
-import com.sun.scenario.animation.AbstractMasterTimer;
 import javafx.application.Application;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.geometry.HPos;
-import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.geometry.Rectangle2D;
 import javafx.geometry.VPos;
 import javafx.scene.*;
 import javafx.scene.control.Button;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
-import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.WritableImage;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.*;
 import javafx.scene.media.AudioClip;
 import javafx.scene.transform.Scale;
 import javafx.stage.Stage;
 import javafx.animation.AnimationTimer;
-import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
-import javafx.scene.control.*;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
 import javafx.scene.paint.Color;
-import javafx.scene.text.Font;
-import javafx.stage.Stage;
 
-import java.awt.*;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.*;
 import javafx.scene.shape.Rectangle;
+import javafx.util.Callback;
 
 public class Main extends Application {
 
@@ -53,13 +42,14 @@ public class Main extends Application {
     static boolean toMacro = false;
     static int timeToCapture = 10000;
     static long berserkTimeStart = 0;
+    static long secondLvlAbilityTime = 0;
     static boolean berserkPressed = false;
+    static boolean secondLvlAbility = false;
     public static boolean endOfTheGame = false;
 
     static AnimationTimer timer;
     static Group group = new Group();
     static Scene scene;
-    static BorderPane layout;
     static StackPane layout2;
     public static Wallpaper wallpaper;
     public static DialogWindow dialogWindow;
@@ -69,8 +59,9 @@ public class Main extends Application {
     static ImageView miniMapView;
     static Group miniMapGroup = new Group();
     static Scale miniMapScale = new Scale();
-    static Group miniMapGroupWrap = new Group();
     static Rectangle miniMapBoxView = new Rectangle();
+
+    static Group root;
 
     public static final long[] frameTimes = new long[100];
     public static int frameTimeIndex = 0 ;
@@ -82,8 +73,8 @@ public class Main extends Application {
         SpawnMicros(tLvls, "t");
         SpawnMicros(ctLvls, "ct");
 
-        Group root = new Group(group);
-        scrollPane = new ScrollPane(root);
+        root = new Group(group);
+        scrollPane = new ScrollPane(group);
 
         scrollPane.setMaxWidth(Wallpaper.border.getWidth());
         scrollPane.setMaxHeight(Wallpaper.border.getHeight());
@@ -91,14 +82,10 @@ public class Main extends Application {
         scrollPane.setFitToHeight(true);
         scrollPane.setFitToWidth(true);
 
-        layout = new BorderPane();
         layout2 = new StackPane();
 
-        System.out.println(layout2.getAlignment());
         miniMapScale.setX(0.1);
         miniMapScale.setY(0.1);
-
-        miniMapGroupWrap.getChildren().add(miniMapGroup);
 
         layout2.getChildren().add(scrollPane);
         layout2.getChildren().add(miniMapGroup);
@@ -106,8 +93,6 @@ public class Main extends Application {
         miniMapGroup.setStyle("-fx-padding: 0 20px 0 0");
 
         scene = new Scene(layout2, width, height);
-        primaryStage.setTitle("CS clone");
-        primaryStage.setScene(scene);
         actualizeMiniMap();
         scene.setOnKeyPressed(new KeyPressHandler());
 
@@ -148,40 +133,25 @@ public class Main extends Application {
             }
         });
 
-//        Timer timerUpdateMap = new Timer();
-//        timerUpdateMap.scheduleAtFixedRate(new TimerTask() {
-//            @Override
-//            public void run() {
-//                Platform.runLater(() -> {
-//                    updateMiniMap();
-//                    System.out.println();
-//                    System.out.println("working on");
-//                    System.out.println();
-//                });
-//            }
-//        }, 0, 500);
-
     timer = new AnimationTimer() {
             @Override
             public void handle(long now) {
 
-                long oldFrameTime = frameTimes[frameTimeIndex] ;
-                frameTimes[frameTimeIndex] = now ;
-                frameTimeIndex = (frameTimeIndex + 1) % frameTimes.length ;
-                if (frameTimeIndex == 0) {
-                    arrayFilled = true ;
-                }
-                if (arrayFilled) {
-                    long elapsedNanos = now - oldFrameTime ;
-                    long elapsedNanosPerFrame = elapsedNanos / frameTimes.length ;
-                    double frameRate = 1_000_000_000.0 / elapsedNanosPerFrame ;
-                    System.out.println("Current frame rate: %.3f" + frameRate);
-                }
-
-
+//                long oldFrameTime = frameTimes[frameTimeIndex] ;
+//                frameTimes[frameTimeIndex] = now ;
+//                frameTimeIndex = (frameTimeIndex + 1) % frameTimes.length ;
+//                if (frameTimeIndex == 0) {
+//                    arrayFilled = true ;
+//                }
+//                if (arrayFilled) {
+//                    long elapsedNanos = now - oldFrameTime ;
+//                    long elapsedNanosPerFrame = elapsedNanos / frameTimes.length ;
+//                    double frameRate = 1_000_000_000.0 / elapsedNanosPerFrame ;
+//                    System.out.println("Current frame rate: " + frameRate);
+//                }
 
                 if(!endOfTheGame){
-                    updateMiniMap();
+//                    updateMiniMap();
 
                     Main.MoveMicro();
 
@@ -209,7 +179,19 @@ public class Main extends Application {
                         for(MicroObject micro : microObjectsT){
                             micro.setSpeed(micro.defaultSpeed);
                             micro.setDamage(micro.defaultDamage);
-                            interval = 100;
+                            interval = 250;
+                        }
+                    }
+
+                    if(secondLvlAbility){
+                        secondLvlAbilityHandle();
+                    }else {
+                        for(MicroObject micro : microObjectsCT){
+                            micro.setSpeed(micro.defaultSpeed);
+                        }
+
+                        for(MicroObject micro : microObjectsCT){
+                            micro.setSpeed(micro.defaultSpeed);
                         }
                     }
 
@@ -243,6 +225,28 @@ public class Main extends Application {
         Main.primaryStage.setScene(dialogWindow.returnDialogScene());
     }
 
+    public static void secondLvlAbilityHandle(){
+        if(secondLvlAbilityTime == 0) {
+            secondLvlAbilityTime = new Date().getTime();
+        }
+        if(secondLvlAbilityTime + 15000 >= new Date().getTime()){
+            for(MicroObject micro : microObjectsCT){
+                if(micro.getLvl() == 2 || micro.getLvl() == 3){
+                    micro.setSpeed(micro.getSpeed() * 2.5);
+                }
+            }
+
+            for(MicroObject micro : microObjectsT){
+                if(micro.getLvl() == 2 || micro.getLvl() == 3){
+                    micro.setSpeed(micro.getSpeed() * 2.5);
+                }
+            }
+        }else{
+            secondLvlAbilityTime = 0;
+            secondLvlAbility = false;
+        }
+    }
+
     public static void berserkHandle(){
         if(berserkTimeStart == 0) {
             berserkTimeStart = new Date().getTime();
@@ -259,26 +263,23 @@ public class Main extends Application {
                 micro.setDamage(micro.getDamage() * 2);
                 interval = 100;
             }
+        }else{
+            berserkTimeStart = 0;
+            berserkPressed = false;
         }
     }
 
     public static void updateMiniMap(){
-        Platform.runLater(() -> {
-            miniMapGroup.getChildren().remove(miniMapView);
-            Image img = null;
-            try {
-                img = new Image(new FileInputStream("src/source/ct_1.png"));
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-            }
-            miniMapBoxView.setX(miniMapBoxView.getX());
-            miniMapBoxView.setY(miniMapBoxView.getY());
-//            Main.group.snapshot(new SnapshotParameters(), null)
-            miniMapView = new ImageView(Main.group.snapshot(new SnapshotParameters(), null));
-            miniMapGroup.getChildren().add(miniMapView);
-            miniMapView.getTransforms().add(miniMapScale);
-        });
-
+        miniMapGroup.getChildren().clear();
+        miniMapBoxView.setX(miniMapBoxView.getX());
+        miniMapBoxView.setY(miniMapBoxView.getY());
+        miniMapView.setFitWidth(370);
+        miniMapView.setFitHeight(300);
+        miniMapView = new ImageView(group.snapshot( null, null));
+        miniMapGroup.getChildren().add(miniMapView);
+        miniMapGroup.getChildren().add(miniMapBoxView);
+        miniMapBoxView.toFront();
+        miniMapView.getTransforms().add(miniMapScale);
     }
     public static void actualizeMiniMap() {
         miniMapBoxView.setX(0);
@@ -287,8 +288,9 @@ public class Main extends Application {
         miniMapBoxView.setWidth(5);
         miniMapBoxView.setFill(Color.WHITE);
         miniMapBoxView.setStroke(Color.NAVAJOWHITE);
-        miniMapView = new ImageView(Main.group.snapshot(new SnapshotParameters(), null));
-        miniMapView.getTransforms().add(miniMapScale);
+        miniMapView = new ImageView(group.snapshot( null, null));
+        miniMapView.setFitWidth(370);
+        miniMapView.setFitHeight(300);
 
         miniMapGroup.getChildren().add(miniMapView);
         miniMapGroup.getChildren().add(miniMapBoxView);
@@ -300,7 +302,7 @@ public class Main extends Application {
         Main.primaryStage = primaryStage;
         Main.setSetupStage();
         primaryStage.show();
-        System.setProperty("quantum.multithreaded", "false");
+        System.setProperty("quantum.multithreading", "false");
     }
 
     public static void SpawnWallpaper() throws FileNotFoundException {
@@ -378,17 +380,19 @@ public class Main extends Application {
             for(MicroObject microT : Main.microObjectsT){
                 if(microCT.microGroup.intersects(microT.microGroup.getLayoutBounds())){
                     long current = new Date().getTime();
-                    if(!((current - lastInvocationT) < interval)){
-                        updateMiniMap();
+                    System.out.println(current - lastInvocationT);
+                    System.out.println(interval);
+                    if(((current - lastInvocationT) > interval)){
                         microT.interactWith(microCT);
                         microCT.interactWith(microT);
                         AudioClip shoot = new AudioClip(new File("src/audio/ak_shoot.mp3").toURI().toString());
+                        shoot.setVolume(10);
                         shoot.play();
                         microT.microLabel.setText("Lvl: " + microT.getLvl() + ", hp: "  + microT.getHp());
                         microCT.microLabel.setText("Lvl: " + microCT.getLvl() + ", hp: "  + microCT.getHp());
                     }
                     lastInvocationT = current;
-                    lastInvocationCT = current;
+//                    lastInvocationCT = current;
                 }
 
                 if(!microT.getAlive()){

@@ -37,6 +37,7 @@ import javafx.stage.Stage;
 
 import java.awt.*;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.*;
@@ -74,8 +75,6 @@ public class Main extends Application {
     public static final long[] frameTimes = new long[100];
     public static int frameTimeIndex = 0 ;
     public static boolean arrayFilled = false ;
-
-    static long mapUpdateTime = 0;
 
     public static void setMainStage(double width, double height, ArrayList<String> ctLvls, ArrayList<String> tLvls) throws FileNotFoundException {
         SpawnWallpaper();
@@ -149,18 +148,18 @@ public class Main extends Application {
             }
         });
 
-        Timer timerUpdateMap = new Timer();
-        timerUpdateMap.scheduleAtFixedRate(new TimerTask() {
-            @Override
-            public void run() {
-                Platform.runLater(() -> {
-                    updateMiniMap();
-                    System.out.println();
-                    System.out.println("working on");
-                    System.out.println();
-                });
-            }
-        }, 200, 500);
+//        Timer timerUpdateMap = new Timer();
+//        timerUpdateMap.scheduleAtFixedRate(new TimerTask() {
+//            @Override
+//            public void run() {
+//                Platform.runLater(() -> {
+//                    updateMiniMap();
+//                    System.out.println();
+//                    System.out.println("working on");
+//                    System.out.println();
+//                });
+//            }
+//        }, 0, 500);
 
     timer = new AnimationTimer() {
             @Override
@@ -182,6 +181,8 @@ public class Main extends Application {
 
 
                 if(!endOfTheGame){
+                    updateMiniMap();
+
                     Main.MoveMicro();
 
                     try {
@@ -262,29 +263,31 @@ public class Main extends Application {
     }
 
     public static void updateMiniMap(){
-        miniMapGroup.getChildren().clear();
+        Platform.runLater(() -> {
+            miniMapGroup.getChildren().remove(miniMapView);
+            Image img = null;
+            try {
+                img = new Image(new FileInputStream("src/source/ct_1.png"));
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
+            miniMapBoxView.setX(miniMapBoxView.getX());
+            miniMapBoxView.setY(miniMapBoxView.getY());
+//            Main.group.snapshot(new SnapshotParameters(), null)
+            miniMapView = new ImageView(Main.group.snapshot(new SnapshotParameters(), null));
+            miniMapGroup.getChildren().add(miniMapView);
+            miniMapView.getTransforms().add(miniMapScale);
+        });
 
-        WritableImage SNAPSHOT = Main.group.snapshot(new SnapshotParameters(), null);
-
-        miniMapBoxView.setX(miniMapBoxView.getX());
-        miniMapBoxView.setY(miniMapBoxView.getY());
-
-        miniMapView = new ImageView(SNAPSHOT);
-        miniMapGroup.getChildren().add(miniMapView);
-        miniMapGroup.getChildren().add(miniMapBoxView);
-        miniMapBoxView.toFront();
-        miniMapView.getTransforms().add(miniMapScale);
     }
     public static void actualizeMiniMap() {
-        WritableImage SNAPSHOT = Main.group.snapshot(new SnapshotParameters(), null);
-
         miniMapBoxView.setX(0);
         miniMapBoxView.setY(0);
         miniMapBoxView.setHeight(5);
         miniMapBoxView.setWidth(5);
         miniMapBoxView.setFill(Color.WHITE);
         miniMapBoxView.setStroke(Color.NAVAJOWHITE);
-        miniMapView = new ImageView(SNAPSHOT);
+        miniMapView = new ImageView(Main.group.snapshot(new SnapshotParameters(), null));
         miniMapView.getTransforms().add(miniMapScale);
 
         miniMapGroup.getChildren().add(miniMapView);

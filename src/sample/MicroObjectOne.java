@@ -1,9 +1,13 @@
 package sample;
 
+import javafx.geometry.HPos;
+import javafx.geometry.VPos;
 import javafx.scene.Group;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -52,25 +56,39 @@ public class MicroObjectOne extends MicroObject{
             this.microWrapper.setTranslateX(this.getX());
             this.microWrapper.setTranslateY(this.getY());
         }
-        this.microLabel.setStyle("-fx-border-color: white;" + "-fx-text-inner-color: white;");
+        this.microLabel.setStyle("-fx-border-color: white; -fx-padding: 3px");
+        this.microLabel.setTextFill(Color.WHITE);
         this.microImageView.setPreserveRatio(true);
-        this.microImageView.setFitHeight(120.0);
+        this.microImageView.setFitHeight(100.0);
         this.microImageView.setFitWidth(90.0);
 
         this.microWrapper.setOnMouseClicked((event) -> {
             this.changeActive();
             if(this.getActive()) {
-                String styleWrapper = "-fx-border-color: red;"
+                String styleWrapper = "-fx-border-color: yellow;"
                         + "-fx-border-width: 1;"
-                        + "-fx-border-style: dotted;";
+                        + "-fx-border-style: solid;";
                 this.microWrapper.setStyle(styleWrapper);
             }else {
                 this.microWrapper.setStyle(" ");
             }
         });
 
+        Rectangle setFit = new Rectangle();
+        setFit.setWidth(100);
+        setFit.setHeight(1);
+        setFit.setFill(Color.TRANSPARENT);
+
         this.microWrapper.getChildren().clear();
-        this.microWrapper.getChildren().addAll(this.microImageView, this.microLabel);
+        microWrapper.setHalignment(this.microImageView, HPos.RIGHT);
+        microWrapper.setValignment(this.microImageView, VPos.CENTER);
+        microWrapper.setHalignment(this.microLabel, HPos.CENTER);
+        microWrapper.setValignment(this.microLabel, VPos.CENTER);
+
+        microWrapper.add(this.microImageView, 0, 0);
+        microWrapper.add(this.microLabel, 0, 1);
+        microWrapper.add(setFit, 0, 2);
+        microWrapper.add(this.healthBar, 0, 3);
         this.microGroup = new Group(this.microWrapper);
 //        this.microGroup = new Group(this.microImageView, this.microLabel);
     }

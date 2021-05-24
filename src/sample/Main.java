@@ -137,24 +137,33 @@ public class Main extends Application {
             public void handle(long now) {
                 if(!endOfTheGame){
                     Main.MoveMicro();
-                    Main.checkIntersectsMacro();
+                    try {
+                        Main.checkIntersectsMacro();
+                    } catch (FileNotFoundException e) {
+                        e.printStackTrace();
+                    }
                     try {
                         Main.checkIntersectsMicro();
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
 
+                    try {
+                        if(sites[1].ct.size() > 0){
 
-                    if(sites[1].ct.size() > 0){
-                        checkGetMacro(sites[1], "ct");
-                    }else if(sites[1].t.size() > 0){
-                        checkGetMacro(sites[1], "t");
-                    }
+                                checkGetMacro(sites[1], "ct");
 
-                    if(sites[0].ct.size() > 0){
-                        checkGetMacro(sites[0], "ct");
-                    }else if(sites[0].t.size() > 0){
-                        checkGetMacro(sites[0], "t");
+                        }else if(sites[1].t.size() > 0){
+                            checkGetMacro(sites[1], "t");
+                        }
+
+                        if(sites[0].ct.size() > 0){
+                            checkGetMacro(sites[0], "ct");
+                        }else if(sites[0].t.size() > 0){
+                            checkGetMacro(sites[0], "t");
+                        }
+                    } catch (FileNotFoundException e) {
+                        e.printStackTrace();
                     }
 
                     checkWin();
@@ -323,7 +332,7 @@ public class Main extends Application {
         }
     }
 
-    public static void checkIntersectsMacro(){
+    public static void checkIntersectsMacro() throws FileNotFoundException {
         ArrayList<MicroObject> microsToRemove = new ArrayList<MicroObject>();
         for(MacroObjSite site : Main.sites){
             for(MicroObject micro : Main.microObjectsCT){
@@ -374,13 +383,13 @@ public class Main extends Application {
         endGrid.getColumnConstraints().add(new ColumnConstraints(200));
 
 
-        if(sites[0].getBelong().equals("ct") && sites[0].getBelong().equals("ct")){
+        if(sites[0].getBelong().equals("ct") && sites[1].getBelong().equals("ct")){
             System.out.println("ct won");
             gameOverLabel.setText("ct won by sites");
             won = true;
         }
 
-        if(sites[0].getBelong().equals("t") && sites[0].getBelong().equals("t")){
+        if(sites[0].getBelong().equals("t") && sites[1].getBelong().equals("t")){
             System.out.println("t won");
             gameOverLabel.setText("t won by sites");
             won = true;
@@ -430,7 +439,7 @@ public class Main extends Application {
         }
     }
 
-    public static void checkGetMacro(MacroObjSite site, String side){
+    public static void checkGetMacro(MacroObjSite site, String side) throws FileNotFoundException {
         if(side.equals("ct")){
             if(!(site.getBelong().equals("ct"))){
                 if(site.t.size() > 0){

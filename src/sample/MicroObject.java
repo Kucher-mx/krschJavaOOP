@@ -1,17 +1,14 @@
 package sample;
 
 import javafx.event.EventHandler;
-import javafx.geometry.BoundingBox;
-import javafx.geometry.Bounds;
+import javafx.geometry.*;
 import javafx.geometry.Insets;
 import javafx.scene.Group;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.Background;
-import javafx.scene.layout.Border;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.scene.media.AudioClip;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
@@ -47,7 +44,9 @@ public class MicroObject implements Comparable<MicroObject>, Cloneable {
     private double destinationY;
     public int id;
 
-    protected VBox microWrapper = new VBox();
+//    protected VBox microWrapper = new VBox();
+    protected GridPane microWrapper = new GridPane();
+    protected Rectangle healthBar = new Rectangle();
     protected Label microLabel;
     protected Group microGroup;
     protected Image microImage;
@@ -158,6 +157,13 @@ public class MicroObject implements Comparable<MicroObject>, Cloneable {
             this.charCordsX = MicroObject.coordsTX;
             this.charCordsY = MicroObject.coordsTY;
 
+            this.microWrapper.getRowConstraints().add(new RowConstraints(100));
+            this.microWrapper.getRowConstraints().add(new RowConstraints(35));
+            this.microWrapper.getRowConstraints().add(new RowConstraints(1));
+            this.microWrapper.getRowConstraints().add(new RowConstraints(5));
+
+            this.microWrapper.getColumnConstraints().add(new ColumnConstraints(100));
+
             microImage = new Image(new FileInputStream("src/source/t_1.png"));
             this.microImageView = new ImageView(microImage);
 
@@ -177,27 +183,44 @@ public class MicroObject implements Comparable<MicroObject>, Cloneable {
 
             MicroObject.coordsCTX += 75;
         }
-        this.microLabel.setStyle("-fx-border-color: white;" + "-fx-text-inner-color: white;");
+        this.microLabel.setStyle("-fx-border-color: white; -fx-padding: 3px");
+        this.microLabel.setTextFill(Color.WHITE);
         this.microImageView.setPreserveRatio(true);
-        this.microImageView.setFitHeight(120.0);
+        this.microImageView.setFitHeight(100.0);
         this.microImageView.setFitWidth(90.0);
+        Rectangle setFit = new Rectangle();
+        setFit.setWidth(100);
+        setFit.setHeight(1);
+        setFit.setFill(Color.TRANSPARENT);
+
+        healthBar.setHeight(5);
+        healthBar.setWidth(100);
+        healthBar.setFill(Color.RED);
 
         this.microWrapper.setOnMouseClicked((event) -> {
             this.changeActive();
             if(this.getActive()) {
-                String styleWrapper = "-fx-border-color: red;"
+                String styleWrapper = "-fx-border-color: yellow;"
                         + "-fx-border-width: 1;"
-                        + "-fx-border-style: dotted;";
+                        + "-fx-border-style: solid;";
                 this.microWrapper.setStyle(styleWrapper);
             }else {
                 this.microWrapper.setStyle(" ");
             }
         });
 
-        this.microWrapper.getChildren().addAll(this.microImageView, this.microLabel);
+        microWrapper.setHalignment(this.microImageView, HPos.RIGHT);
+        microWrapper.setValignment(this.microImageView, VPos.CENTER);
+        microWrapper.setHalignment(this.microLabel, HPos.CENTER);
+        microWrapper.setValignment(this.microLabel, VPos.CENTER);
+
+        microWrapper.add(this.microImageView, 0, 0);
+        microWrapper.add(this.microLabel, 0, 1);
+        microWrapper.add(setFit, 0, 2);
+        microWrapper.add(this.healthBar, 0, 3);
+
         this.microGroup = new Group(this.microWrapper);
 
-//        this.microGroup = new Group(this.microImageView, this.microLabel);
         MicroObject.idCounter++;
     }
 
@@ -257,13 +280,16 @@ public class MicroObject implements Comparable<MicroObject>, Cloneable {
         switch (this.characterLevel){
             case 1:
                 this.characterHp -= enemy.getDamage();
+                this.healthBar.setWidth(this.characterHp);
                 break;
             case 2:
                 this.characterHp -= Math.round(enemy.getDamage() / 1.25);
+                this.healthBar.setWidth(this.characterHp);
                 this.characterKevlar -= 10;
                 break;
             case 3:
                 this.characterHp -= Math.round(enemy.getDamage() / 1.5);
+                this.healthBar.setWidth(this.characterHp);
                 this.characterKevlar -= 7;
                 break;
         }

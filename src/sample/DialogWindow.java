@@ -58,8 +58,19 @@ public class DialogWindow {
             @Override
             public void handle(ActionEvent e) {
                 if (textField.getText() != null){
-                    int sizeOfTheTeam = Integer.parseInt(textField.getText());
-                    Main.teamSize = sizeOfTheTeam;
+                    try{
+                        int sizeOfTheTeam = Integer.parseInt(textField.getText());
+                        if(sizeOfTheTeam > 5){
+                            Main.teamSize = 5;
+                        }else if(sizeOfTheTeam < 1){
+                            Main.teamSize = 1;
+                        }else {
+                            Main.teamSize = sizeOfTheTeam;
+                        }
+                    }catch (NumberFormatException err){
+                        Main.teamSize = Main.random.nextInt(4) + 1;
+                    }
+
 
                     pane.getChildren().clear();
                     while(pane.getRowConstraints().size() > 0){

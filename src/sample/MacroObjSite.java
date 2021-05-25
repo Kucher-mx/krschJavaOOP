@@ -107,6 +107,7 @@ public class MacroObjSite {
                 Iterator ctIterator = ct.iterator();
                 while (ctIterator.hasNext()) {
                     MicroObject unitCT = (MicroObject) ctIterator.next();
+                    Main.microObjectsCT.add(unitCT);
                     unitCT.setXCoord(2100 + Main.random.nextInt(100));
                     unitCT.setYCoord(420 + Main.random.nextInt(75));
                     unitCT.microWrapper.setTranslateX(unitCT.getX());
@@ -114,7 +115,6 @@ public class MacroObjSite {
                     unitCT.setSpeed(unitCT.defaultSpeed);
                     unitCT.microWrapper.setStyle(" ");
                     unitCT.changeActive();
-                    Main.microObjectsCT.add(unitCT);
                     if(!Main.group.getChildren().contains(unitCT.microGroup)){
                         Main.group.getChildren().add(unitCT.microGroup);
                     }

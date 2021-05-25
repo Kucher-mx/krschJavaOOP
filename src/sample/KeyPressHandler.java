@@ -229,6 +229,15 @@ public class KeyPressHandler implements EventHandler<KeyEvent>{
 
         if (event.getCode().equals(KeyCode.B)){
             Main.berserkPressed = true;
+            for(MicroObject micro : Main.microObjectsCT){
+                micro.setDamage(micro.defaultDamage * 3);
+                micro.microLabel.setStyle("-fx-border-color: blue; -fx-padding: 3px");
+            }
+
+            for(MicroObject micro : Main.microObjectsT){
+                micro.setDamage(micro.defaultDamage * 3);
+                micro.microLabel.setStyle("-fx-border-color: blue; -fx-padding: 3px");
+            }
         }
 
         if (event.getCode().equals(KeyCode.U)){

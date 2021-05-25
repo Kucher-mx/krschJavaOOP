@@ -91,7 +91,7 @@ public class MicroObjectTwo extends MicroObjectOne{
                 ", hp: " + super.getHp() +
                 ", lvl: " + characterLevel +
                 ", kevlar" + super.getKevlar() +
-                ", damage" + super.getDamage() +
+                ", damage" + super.getDamageProp() +
                 ", x: " + super.getX() +
                 ", y: " + super.getY() +
                 " }";

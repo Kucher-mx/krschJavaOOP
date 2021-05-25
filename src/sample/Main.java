@@ -37,6 +37,8 @@ public class Main extends Application {
     static int timeToCapture = 10000;
     static long berserkTimeStart = 0;
     static long secondLvlAbilityTime = 0;
+    static long secondLvlAbilityTimeEnd = new Date().getTime() - 30000;
+    static long berserkTimeEnd = new Date().getTime() - 30000;
     static boolean berserkPressed = false;
     static boolean secondLvlAbility = false;
     public static boolean endOfTheGame = false;
@@ -166,33 +168,40 @@ public class Main extends Application {
                         e.printStackTrace();
                     }
 
-                    if(berserkPressed){
-                        berserkHandle();
-                    }else {
-                        for(MicroObject micro : microObjectsCT){
-                            micro.setSpeed(micro.defaultSpeed);
-                            micro.setDamage(micro.defaultDamage);
+                    if(berserkTimeEnd + 30000 <= new Date().getTime()){
+                        if(berserkPressed){
+                            berserkHandle();
+                        }else {
                             interval = 250;
-                        }
+                            for(MicroObject micro : microObjectsCT){
+                                micro.setDamage(micro.defaultDamage);
+                                micro.microLabel.setTextFill(Color.WHITE);
+                            }
 
-                        for(MicroObject micro : microObjectsT){
-                            micro.setSpeed(micro.defaultSpeed);
-                            micro.setDamage(micro.defaultDamage);
-                            interval = 250;
+                            for(MicroObject micro : microObjectsT){
+                                micro.setDamage(micro.defaultDamage);
+                                micro.microLabel.setTextFill(Color.WHITE);
+                            }
                         }
                     }
 
-                    if(secondLvlAbility){
-                        secondLvlAbilityHandle();
-                    }else {
-                        for(MicroObject micro : microObjectsCT){
-                            micro.setSpeed(micro.defaultSpeed);
-                        }
+                    if(secondLvlAbilityTimeEnd + 30000 <= new Date().getTime()){
+                        if(secondLvlAbility){
+                            secondLvlAbilityHandle();
+                        }else {
+                            for(MicroObject micro : microObjectsCT){
+                                micro.setSpeed(micro.defaultSpeed);
+                                micro.microLabel.setStyle("-fx-border-color: white; -fx-padding: 3px");
+                            }
 
-                        for(MicroObject micro : microObjectsCT){
-                            micro.setSpeed(micro.defaultSpeed);
+                            for(MicroObject micro : microObjectsT){
+                                micro.microLabel.setStyle("-fx-border-color: white; -fx-padding: 3px");
+                                micro.setSpeed(micro.defaultSpeed);
+                            }
                         }
                     }
+
+
 
                     try {
                         if(sites[1].ct.size() > 0){
@@ -220,7 +229,7 @@ public class Main extends Application {
 
     public static void setSetupStage(){
         dialogWindow = new DialogWindow();
-        Main.primaryStage.setTitle("Test Dialog");
+        Main.primaryStage.setTitle("Cs Clone Dialog");
         Main.primaryStage.setScene(dialogWindow.returnDialogScene());
     }
 
@@ -232,9 +241,6 @@ public class Main extends Application {
             showInfoActiveWrapper.setPrefWidth(800);
             showInfoActiveWrapper.setBackground(new Background(new BackgroundFill(Color.CORNFLOWERBLUE, CornerRadii.EMPTY, Insets.EMPTY)));
             showInfoActiveWrapper.setAlignment(Pos.CENTER);
-//            showInfoActiveGroup.getChildren().add(showInfoActiveWrapper);
-//            layout2.getChildren().add(showInfoActiveGroup);
-//            layout2.setAlignment(showInfoActiveGroup, Pos.BOTTOM_CENTER);
         }else{
             for(Node label : showInfoActiveWrapper.getChildren()){
                 if(label.getId().equals(String.valueOf(unit.id))){
@@ -252,16 +258,19 @@ public class Main extends Application {
         if(secondLvlAbilityTime + 15000 >= new Date().getTime()){
             for(MicroObject micro : microObjectsCT){
                 if(micro.getLvl() == 2 || micro.getLvl() == 3){
-                    micro.setSpeed(micro.getSpeed() * 2.5);
+                    micro.microLabel.setStyle("-fx-border-color: blue; -fx-padding: 3px");
+                    micro.setSpeed(micro.defaultSpeed * 2);
                 }
             }
 
             for(MicroObject micro : microObjectsT){
                 if(micro.getLvl() == 2 || micro.getLvl() == 3){
-                    micro.setSpeed(micro.getSpeed() * 2.5);
+                    micro.microLabel.setStyle("-fx-border-color: blue; -fx-padding: 3px");
+                    micro.setSpeed(micro.defaultSpeed * 2);
                 }
             }
         }else{
+            secondLvlAbilityTimeEnd = new Date().getTime();
             secondLvlAbilityTime = 0;
             secondLvlAbility = false;
         }
@@ -272,18 +281,18 @@ public class Main extends Application {
             berserkTimeStart = new Date().getTime();
         }
         if(berserkTimeStart + 15000 >= new Date().getTime()){
+            interval = 100;
             for(MicroObject micro : microObjectsCT){
-                micro.setSpeed(micro.getSpeed() * 1.5);
-                micro.setDamage(micro.getDamage() * 2);
-                interval = 100;
+                micro.setDamage(micro.defaultDamage * 3);
+                micro.microLabel.setTextFill(Color.RED);
             }
 
             for(MicroObject micro : microObjectsT){
-                micro.setSpeed(micro.getSpeed() * 1.5);
-                micro.setDamage(micro.getDamage() * 2);
-                interval = 100;
+                micro.setDamage(micro.defaultDamage * 3);
+                micro.microLabel.setTextFill(Color.RED);
             }
         }else{
+            berserkTimeEnd = new Date().getTime();
             berserkTimeStart = 0;
             berserkPressed = false;
         }
@@ -353,10 +362,12 @@ public class Main extends Application {
     static void MoveMicro(){
         for (MicroObject micro : Main.microObjectsT){
             micro.run(Main.toMacro);
+            System.out.println(micro);
         }
 
         for (MicroObject micro : Main.microObjectsCT){
             micro.run(Main.toMacro);
+            System.out.println(micro);
         }
     }
 

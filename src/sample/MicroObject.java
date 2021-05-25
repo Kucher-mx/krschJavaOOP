@@ -27,7 +27,6 @@ public class MicroObject implements Comparable<MicroObject>, Cloneable {
     private boolean inMacroSite = false;
     public long lastHealtTime = 0;
 
-    protected int stamina = 100;
     private double charCordsX;
     private double charCordsY;
     private double destinationX;
@@ -36,7 +35,6 @@ public class MicroObject implements Comparable<MicroObject>, Cloneable {
     public double defaultSpeed;
     public int defaultDamage;
 
-//    protected VBox microWrapper = new VBox();
     protected GridPane microWrapper = new GridPane();
     protected Rectangle healthBar = new Rectangle();
     protected Label microLabel;
@@ -88,7 +86,7 @@ public class MicroObject implements Comparable<MicroObject>, Cloneable {
         this.characterKevlar = newKevlar;
     }
 
-    public int getDamage(){
+    public int getDamageProp(){
         return this.damage;
     }
 
@@ -144,11 +142,6 @@ public class MicroObject implements Comparable<MicroObject>, Cloneable {
         return this.inMacroSite;
     }
 
-    public static double coordsTX = 1300.0;
-    public static double coordsTY = 2700.0;
-    public static double coordsCTX = 2050.0;
-    public static double coordsCTY = 570.0;
-
     public MicroObject(String side) throws FileNotFoundException {
         this.characterSite = side;
         this.characterLevel = 1;
@@ -179,11 +172,7 @@ public class MicroObject implements Comparable<MicroObject>, Cloneable {
 
             this.microWrapper.setTranslateX(this.charCordsX);
             this.microWrapper.setTranslateY(this.charCordsY);
-
-//            MicroObject.coordsTX += 75;
         }else{
-//            this.charCordsX = MicroObject.coordsCTX;
-//            this.charCordsY = MicroObject.coordsCTY;
             this.charCordsX = 2100.0 + Main.random.nextInt(100);
             this.charCordsY = 500.0 + Main.random.nextInt(75);
 
@@ -192,8 +181,6 @@ public class MicroObject implements Comparable<MicroObject>, Cloneable {
 
             this.microWrapper.setTranslateX(this.charCordsX);
             this.microWrapper.setTranslateY(this.charCordsY);
-
-//            MicroObject.coordsCTX += 75;
         }
         this.microLabel.setStyle("-fx-border-color: white; -fx-padding: 3px");
         this.microLabel.setTextFill(Color.WHITE);
@@ -296,16 +283,16 @@ public class MicroObject implements Comparable<MicroObject>, Cloneable {
     public void getDamage(MicroObject enemy){
         switch (this.characterLevel){
             case 1:
-                this.characterHp -= enemy.getDamage();
+                this.characterHp -= enemy.getDamageProp();
                 this.healthBar.setWidth(this.characterHp);
                 break;
             case 2:
-                this.characterHp -= Math.round(enemy.getDamage() / 1.25);
+                this.characterHp -= Math.round(enemy.getDamageProp() / 1.25);
                 this.healthBar.setWidth(this.characterHp);
                 this.characterKevlar -= 10;
                 break;
             case 3:
-                this.characterHp -= Math.round(enemy.getDamage() / 1.5);
+                this.characterHp -= Math.round(enemy.getDamageProp() / 1.5);
                 this.healthBar.setWidth(this.characterHp);
                 this.characterKevlar -= 7;
                 break;

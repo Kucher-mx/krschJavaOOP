@@ -4,24 +4,19 @@ import javafx.application.Application;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
-import javafx.geometry.HPos;
-import javafx.geometry.Pos;
-import javafx.geometry.Rectangle2D;
-import javafx.geometry.VPos;
+import javafx.geometry.*;
 import javafx.scene.*;
 import javafx.scene.control.Button;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.image.ImageView;
-import javafx.scene.image.WritableImage;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.media.AudioClip;
 import javafx.scene.transform.Scale;
 import javafx.stage.Stage;
 import javafx.animation.AnimationTimer;
-import javafx.application.Platform;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import javafx.scene.paint.Color;
@@ -30,7 +25,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.*;
 import javafx.scene.shape.Rectangle;
-import javafx.util.Callback;
 
 public class Main extends Application {
 
@@ -63,6 +57,10 @@ public class Main extends Application {
 
     static Group root;
 
+    static Group showInfoActiveGroup = new Group();
+    static VBox showInfoActiveWrapper = new VBox();
+
+    //check framerate
     public static final long[] frameTimes = new long[100];
     public static int frameTimeIndex = 0 ;
     public static boolean arrayFilled = false ;
@@ -90,6 +88,11 @@ public class Main extends Application {
         layout2.getChildren().add(scrollPane);
         layout2.getChildren().add(miniMapGroup);
         layout2.setAlignment(miniMapGroup, Pos.TOP_RIGHT);
+
+
+        showInfoActiveGroup.getChildren().add(showInfoActiveWrapper);
+        layout2.getChildren().add(showInfoActiveGroup);
+        layout2.setAlignment(showInfoActiveGroup, Pos.BOTTOM_CENTER);
         miniMapGroup.setStyle("-fx-padding: 0 20px 0 0");
 
         scene = new Scene(layout2, width, height);
@@ -107,9 +110,6 @@ public class Main extends Application {
 
                 miniMapBoxView.setX(x);
                 miniMapBoxView.setY(y);
-
-                System.out.println(x + ",y: " + y);
-                System.out.println(miniMapBoxView.getX() + ",y: " + miniMapBoxView.getY());
 
                 double posX = ( (x) / (3700*0.1) * 3700);
                 double posY = ( (y) / (3000*0.1) * 3000);
@@ -154,7 +154,6 @@ public class Main extends Application {
 //                    updateMiniMap();
 
                     Main.MoveMicro();
-
                     try {
                         Main.checkIntersectsMacro();
                     } catch (FileNotFoundException e) {
@@ -225,6 +224,27 @@ public class Main extends Application {
         Main.primaryStage.setScene(dialogWindow.returnDialogScene());
     }
 
+    public static void showInfoActive(MicroObject unit, boolean add){
+        if(add){
+            Label unitInfo = new Label(unit.toString());
+            unitInfo.setId(String.valueOf(unit.id));
+            showInfoActiveWrapper.getChildren().add(unitInfo);
+            showInfoActiveWrapper.setPrefWidth(800);
+            showInfoActiveWrapper.setBackground(new Background(new BackgroundFill(Color.CORNFLOWERBLUE, CornerRadii.EMPTY, Insets.EMPTY)));
+            showInfoActiveWrapper.setAlignment(Pos.CENTER);
+//            showInfoActiveGroup.getChildren().add(showInfoActiveWrapper);
+//            layout2.getChildren().add(showInfoActiveGroup);
+//            layout2.setAlignment(showInfoActiveGroup, Pos.BOTTOM_CENTER);
+        }else{
+            for(Node label : showInfoActiveWrapper.getChildren()){
+                if(label.getId().equals(String.valueOf(unit.id))){
+                    showInfoActiveWrapper.getChildren().remove(label);
+                    break;
+                }
+            }
+        }
+    }
+
     public static void secondLvlAbilityHandle(){
         if(secondLvlAbilityTime == 0) {
             secondLvlAbilityTime = new Date().getTime();
@@ -281,6 +301,7 @@ public class Main extends Application {
         miniMapBoxView.toFront();
         miniMapView.getTransforms().add(miniMapScale);
     }
+
     public static void actualizeMiniMap() {
         miniMapBoxView.setX(0);
         miniMapBoxView.setY(0);
@@ -302,7 +323,6 @@ public class Main extends Application {
         Main.primaryStage = primaryStage;
         Main.setSetupStage();
         primaryStage.show();
-        System.setProperty("quantum.multithreading", "false");
     }
 
     public static void SpawnWallpaper() throws FileNotFoundException {
@@ -371,7 +391,6 @@ public class Main extends Application {
     }
 
     static long lastInvocationT = new Date().getTime();
-    static long lastInvocationCT = new Date().getTime();
     static long interval = 250;
 
     public static void checkIntersectsMicro() throws InterruptedException {
@@ -380,8 +399,6 @@ public class Main extends Application {
             for(MicroObject microT : Main.microObjectsT){
                 if(microCT.microGroup.intersects(microT.microGroup.getLayoutBounds())){
                     long current = new Date().getTime();
-                    System.out.println(current - lastInvocationT);
-                    System.out.println(interval);
                     if(((current - lastInvocationT) > interval)){
                         microT.interactWith(microCT);
                         microCT.interactWith(microT);
@@ -392,7 +409,6 @@ public class Main extends Application {
                         microCT.microLabel.setText("Lvl: " + microCT.getLvl() + ", hp: "  + microCT.getHp());
                     }
                     lastInvocationT = current;
-//                    lastInvocationCT = current;
                 }
 
                 if(!microT.getAlive()){
@@ -418,6 +434,7 @@ public class Main extends Application {
         for(MacroObjSite site : Main.sites){
             for(MicroObject micro : Main.microObjectsCT){
                 if(site.siteGroup.intersects(micro.microGroup.getLayoutBounds()) && !site.getBelong().equals("ct")){
+                    showInfoActive(micro, false);
                     site.addCt(micro);
                     Main.group.getChildren().remove(micro.microGroup);
                     checkGetMacro(site, "ct");
@@ -430,6 +447,7 @@ public class Main extends Application {
 
             for(MicroObject micro : Main.microObjectsT){
                 if(site.siteGroup.intersects(micro.microGroup.getLayoutBounds()) && !site.getBelong().equals("t")){
+                    showInfoActive(micro, false);
                     site.addT(micro);
                     Main.group.getChildren().remove(micro.microGroup);
                     checkGetMacro(site, "t");
@@ -453,7 +471,7 @@ public class Main extends Application {
     public static void checkWin(){
         Dialog<Boolean> dialog = new Dialog<>();
         dialog.setTitle("Game Over");
-        Button restart = new Button("Restart");
+        Button restart = new Button("Quit");
         Label gameOverLabel = new Label();
         GridPane endGrid = new GridPane();
         Boolean won = false;
@@ -465,25 +483,21 @@ public class Main extends Application {
 
 
         if(sites[0].getBelong().equals("ct") && sites[1].getBelong().equals("ct")){
-            System.out.println("ct won");
             gameOverLabel.setText("ct won by sites");
             won = true;
         }
 
         if(sites[0].getBelong().equals("t") && sites[1].getBelong().equals("t")){
-            System.out.println("t won");
             gameOverLabel.setText("t won by sites");
             won = true;
         }
 
         if(microObjectsCT.size() == 0 && microObjectsT.size() > 0 && (sites[0].ct.size() == 0 && sites[1].ct.size() == 0)){
-            System.out.println("t won by quantity");
             gameOverLabel.setText("t won by quantity");
             won = true;
         }
 
         if(microObjectsT.size() == 0 && microObjectsCT.size() > 0 && (sites[0].t.size() == 0 && sites[1].t.size() == 0)){
-            System.out.println("ct won by quantity");
             gameOverLabel.setText("ct won by quantity");
             won = true;
         }
@@ -493,8 +507,8 @@ public class Main extends Application {
         endGrid.setHalignment(restart, HPos.CENTER);
         endGrid.setValignment(restart, VPos.CENTER);
 
-        dialog.getDialogPane().setPrefSize(320, 250);
-        endGrid.setStyle("-fx-padding: 110px 0 0 40px;");
+        dialog.getDialogPane().setPrefSize(320, 150);
+        endGrid.setStyle("-fx-padding: 25px 0 0 60px;");
         endGrid.setGridLinesVisible(true);
 
         if(won){
@@ -504,11 +518,6 @@ public class Main extends Application {
             restart.setOnAction(new EventHandler<ActionEvent>() {
                 @Override
                 public void handle(ActionEvent actionEvent) {
-//                    microObjectsCT.clear();
-//                    microObjectsT.clear();
-//                    Main.setSetupStage();
-//                    Main.group.getChildren().clear();
-//                    Main.miniMapGroup.getChildren().clear();
                     dialog.setResult(Boolean.TRUE);
                     System.exit(0);
                 }
@@ -535,6 +544,7 @@ public class Main extends Application {
                     if(site.timeStartedCT == 0){
                         site.timeStartedCT = new Date().getTime();
                     }
+
                     site.getMacro("ct");
                 }
             }else if(site.getBelong().equals("none")){

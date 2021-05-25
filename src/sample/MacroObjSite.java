@@ -8,8 +8,6 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Rectangle;
-import javafx.scene.text.Text;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -98,7 +96,7 @@ public class MacroObjSite {
             if(timeStartedCT + Main.timeToCapture <= new Date().getTime()){
                 this.setBelong("ct");
                 this.siteLabel.setText("Site" + this.getName() + ", belongs to: " + belongs);
-
+                siteWrapper.getChildren().remove(getImgView);
                 getImg = new Image(new FileInputStream("src/source/ct_got_spot.png"));
                 getImgView = new ImageView(getImg);
                 getImgView.setPreserveRatio(true);
@@ -109,23 +107,28 @@ public class MacroObjSite {
                 Iterator ctIterator = ct.iterator();
                 while (ctIterator.hasNext()) {
                     MicroObject unitCT = (MicroObject) ctIterator.next();
-                    unitCT.setXCoord(0);
-                    unitCT.setYCoord(0);
+                    unitCT.setXCoord(2100 + Main.random.nextInt(100));
+                    unitCT.setYCoord(420 + Main.random.nextInt(75));
+                    unitCT.microWrapper.setTranslateX(unitCT.getX());
+                    unitCT.microWrapper.setTranslateY(unitCT.getY());
                     unitCT.setSpeed(unitCT.defaultSpeed);
                     unitCT.microWrapper.setStyle(" ");
                     unitCT.changeActive();
                     Main.microObjectsCT.add(unitCT);
-                    Main.group.getChildren().add(unitCT.microGroup);
+                    if(!Main.group.getChildren().contains(unitCT.microGroup)){
+                        Main.group.getChildren().add(unitCT.microGroup);
+                    }
                 }
-                ct.remove(0);
+                ct.clear();
                 Main.toMacro = false;
                 this.timeStartedCT = 0;
             }
         }else if(side.equals("t")){
+
             if(timeStartedT + Main.timeToCapture <= new Date().getTime()){
                 this.setBelong("t");
                 this.siteLabel.setText("Site" + this.getName() + ", belongs to: " + belongs);
-
+                siteWrapper.getChildren().remove(getImgView);
                 getImg = new Image(new FileInputStream("src/source/t_got_spot.png"));
                 getImgView = new ImageView(getImg);
                 getImgView.setPreserveRatio(true);
@@ -139,14 +142,17 @@ public class MacroObjSite {
                     MicroObject unitT = (MicroObject) tIterator.next();
                     unitT.microWrapper.setStyle(" ");
                     unitT.changeActive();
-                    unitT.setXCoord(0);
+                    unitT.setXCoord(1030 + Main.random.nextInt(100));
+                    unitT.setYCoord(2060 + Main.random.nextInt(50));
+                    unitT.microWrapper.setTranslateX(unitT.getX());
+                    unitT.microWrapper.setTranslateY(unitT.getY());
                     unitT.setSpeed(unitT.defaultSpeed);
-                    unitT.setYCoord(0);
-                    System.out.println(unitT);
                     Main.microObjectsT.add(unitT);
-                    Main.group.getChildren().add(unitT.microGroup);
+                    if(!Main.group.getChildren().contains(unitT.microGroup)){
+                        Main.group.getChildren().add(unitT.microGroup);
+                    }
                 }
-                t.remove(0);
+                t.clear();
                 Main.toMacro = false;
                 this.timeStartedT = 0;
             }
@@ -214,9 +220,8 @@ public class MacroObjSite {
             siteWrapper.setStyle("-fx-background-color: gray");
             siteWrapper.setOpacity(0.8);
         }
-        siteLabel.setStyle("-fx-border-style: solid inside;" +
+        siteLabel.setStyle("-fx-border-style: solid outside;" +
                 "-fx-border-width: 2;" +
-                "-fx-border-insets: 5;" +
                 "-fx-border-radius: 5;" +
                 "-fx-border-color: blue;");
         this.siteGroup = new Group(siteWrapper);

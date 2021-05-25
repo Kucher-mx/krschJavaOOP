@@ -1,24 +1,16 @@
 package sample;
 
-import javafx.event.EventHandler;
 import javafx.geometry.*;
-import javafx.geometry.Insets;
 import javafx.scene.Group;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.media.AudioClip;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
-import javafx.scene.text.Font;
-import javafx.scene.media.Media;
-import javafx.scene.media.MediaPlayer;
 import java.io.File;
 
-import java.awt.*;
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.*;
@@ -172,8 +164,8 @@ public class MicroObject implements Comparable<MicroObject>, Cloneable {
 
         this.microLabel = new Label("Lvl: 1, hp: "  + this.getHp());
         if(side.equals("t")){
-            this.charCordsX = MicroObject.coordsTX;
-            this.charCordsY = MicroObject.coordsTY;
+            this.charCordsX = 1030.0 + Main.random.nextInt(100);
+            this.charCordsY = 2700.0 + Main.random.nextInt(75);
 
             this.microWrapper.getRowConstraints().add(new RowConstraints(100));
             this.microWrapper.getRowConstraints().add(new RowConstraints(35));
@@ -188,10 +180,12 @@ public class MicroObject implements Comparable<MicroObject>, Cloneable {
             this.microWrapper.setTranslateX(this.charCordsX);
             this.microWrapper.setTranslateY(this.charCordsY);
 
-            MicroObject.coordsTX += 75;
+//            MicroObject.coordsTX += 75;
         }else{
-            this.charCordsX = MicroObject.coordsCTX;
-            this.charCordsY = MicroObject.coordsCTY;
+//            this.charCordsX = MicroObject.coordsCTX;
+//            this.charCordsY = MicroObject.coordsCTY;
+            this.charCordsX = 2100.0 + Main.random.nextInt(100);
+            this.charCordsY = 500.0 + Main.random.nextInt(75);
 
             microImage = new Image(new FileInputStream("src/source/ct_1.png"));
             this.microImageView = new ImageView(microImage);
@@ -199,7 +193,7 @@ public class MicroObject implements Comparable<MicroObject>, Cloneable {
             this.microWrapper.setTranslateX(this.charCordsX);
             this.microWrapper.setTranslateY(this.charCordsY);
 
-            MicroObject.coordsCTX += 75;
+//            MicroObject.coordsCTX += 75;
         }
         this.microLabel.setStyle("-fx-border-color: white; -fx-padding: 3px");
         this.microLabel.setTextFill(Color.WHITE);
@@ -222,8 +216,10 @@ public class MicroObject implements Comparable<MicroObject>, Cloneable {
                         + "-fx-border-width: 1;"
                         + "-fx-border-style: solid;";
                 this.microWrapper.setStyle(styleWrapper);
+                Main.showInfoActive(this, true);
             }else {
                 this.microWrapper.setStyle(" ");
+                Main.showInfoActive(this, false);
             }
         });
 
@@ -295,20 +291,6 @@ public class MicroObject implements Comparable<MicroObject>, Cloneable {
     }
 
     public void useHealt() {
-        System.out.println("in Micro1");
-    }
-
-    public void useRunAbility(double x, double y) {
-        if(stamina > 0){
-            System.out.println("in if");
-            this.setSpeed(this.getSpeed() * 3);
-            this.run(x, y);
-            stamina -= 5;
-        }else{
-            System.out.println("in else");
-            this.setSpeed(this.defaultSpeed);
-            this.run(x, y);
-        }
     }
 
     public void getDamage(MicroObject enemy){
@@ -335,8 +317,6 @@ public class MicroObject implements Comparable<MicroObject>, Cloneable {
         if(this.getActive() || this.getInMacro()){
             return;
         }
-
-//        System.out.println("run to: x dest: "+ this.destinationX + " y dest: " + this.destinationY);
 
         if(Math.round(this.getX()) == Math.round(this.destinationX) && !toMacro){
 

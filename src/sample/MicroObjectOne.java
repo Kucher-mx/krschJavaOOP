@@ -69,9 +69,12 @@ public class MicroObjectOne extends MicroObject{
                 String styleWrapper = "-fx-border-color: yellow;"
                         + "-fx-border-width: 1;"
                         + "-fx-border-style: solid;";
+                System.out.println("call showInfo");
                 this.microWrapper.setStyle(styleWrapper);
+                Main.showInfoActive(this, true);
             }else {
                 this.microWrapper.setStyle(" ");
+                Main.showInfoActive(this, false);
             }
         });
 
@@ -102,21 +105,6 @@ public class MicroObjectOne extends MicroObject{
         System.out.println("Enter your message");
         String msg = in.nextLine();
         super.sayToChild(msg);
-    }
-
-    public void useRunAbility(double x, double y) {
-//        if(stamina > 0){
-//            System.out.println(this.getSpeed());
-//            this.setSpeed(this.getSpeed() * 1.5);
-//            System.out.println(this.getSpeed());
-//            this.run(x, y);
-//            stamina -= 5;
-//        }else{
-//            this.setSpeed(this.defaultSpeed);
-//            this.run(x, y);
-//        }
-
-//        System.out.println("in Micro2 run");
     }
 
     @Override

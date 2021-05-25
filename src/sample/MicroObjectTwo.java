@@ -48,9 +48,12 @@ public class MicroObjectTwo extends MicroObjectOne{
                 String styleWrapper = "-fx-border-color: yellow;"
                         + "-fx-border-width: 1;"
                         + "-fx-border-style: solid;";
+                System.out.println("call showInfo");
                 this.microWrapper.setStyle(styleWrapper);
+                Main.showInfoActive(this, true);
             }else {
                 this.microWrapper.setStyle(" ");
+                Main.showInfoActive(this, false);
             }
         });
 
@@ -75,7 +78,6 @@ public class MicroObjectTwo extends MicroObjectOne{
 
 
     public void useHealt(){
-        System.out.println("in micro 2");
         if(this.getHp() <= 95){
             this.setHp(this.getHp() + 2);
         }

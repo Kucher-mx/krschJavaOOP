@@ -114,10 +114,15 @@ public class MacroObjSite {
                     unitCT.microWrapper.setTranslateY(unitCT.getY());
                     unitCT.setSpeed(unitCT.defaultSpeed);
                     unitCT.microWrapper.setStyle(" ");
-                    unitCT.changeActive();
+                    if(unitCT.getActive()){
+                        unitCT.changeActive();
+                    }
                     if(!Main.group.getChildren().contains(unitCT.microGroup)){
                         Main.group.getChildren().add(unitCT.microGroup);
                     }
+                    unitCT.microWrapper.setTranslateX(unitCT.getX());
+                    unitCT.microWrapper.setTranslateY(unitCT.getY());
+                    unitCT.setSpeed(unitCT.defaultSpeed);
                 }
                 ct.clear();
                 Main.toMacro = false;
@@ -141,16 +146,18 @@ public class MacroObjSite {
                 while (tIterator.hasNext()) {
                     MicroObject unitT = (MicroObject) tIterator.next();
                     unitT.microWrapper.setStyle(" ");
-                    unitT.changeActive();
-                    unitT.setXCoord(1030 + Main.random.nextInt(100));
-                    unitT.setYCoord(2060 + Main.random.nextInt(50));
-                    unitT.microWrapper.setTranslateX(unitT.getX());
-                    unitT.microWrapper.setTranslateY(unitT.getY());
-                    unitT.setSpeed(unitT.defaultSpeed);
+                    if(unitT.getActive()){
+                        unitT.changeActive();
+                    }
+                    unitT.setXCoord(1060.0 + Main.random.nextInt(100));
+                    unitT.setYCoord(2570.0 + Main.random.nextInt(50));
                     Main.microObjectsT.add(unitT);
                     if(!Main.group.getChildren().contains(unitT.microGroup)){
                         Main.group.getChildren().add(unitT.microGroup);
                     }
+                    unitT.microWrapper.setTranslateX(unitT.getX());
+                    unitT.microWrapper.setTranslateY(unitT.getY());
+                    unitT.setSpeed(unitT.defaultSpeed);
                 }
                 t.clear();
                 Main.toMacro = false;

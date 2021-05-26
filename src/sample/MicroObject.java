@@ -307,7 +307,7 @@ public class MicroObject implements Comparable<MicroObject>, Cloneable {
 
         if(Math.round(this.getX()) == Math.round(this.destinationX) && !toMacro){
 
-            this.destinationX = (double)Main.random.nextInt(3700);
+            this.destinationX = (double)Main.random.nextInt(3650);
 
         }else if(Math.round(this.getY()) == Math.round(this.destinationY) && !toMacro){
 

@@ -360,15 +360,15 @@ public class Main extends Application {
     }
 
     static void MoveMicro(){
+
         for (MicroObject micro : Main.microObjectsT){
             micro.run(Main.toMacro);
-            System.out.println(micro);
         }
 
         for (MicroObject micro : Main.microObjectsCT){
             micro.run(Main.toMacro);
-            System.out.println(micro);
         }
+
     }
 
     static void SpawnMicros(ArrayList<String> lvls, String side) throws FileNotFoundException {

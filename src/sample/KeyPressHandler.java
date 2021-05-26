@@ -43,7 +43,6 @@ public class KeyPressHandler implements EventHandler<KeyEvent>{
         for(int i = 0; i < Main.microObjectsT.size(); i++){
             if(Main.microObjectsT.size() > 0){
                 if(Main.microObjectsT.get(i).getActive()){
-                    double speed = Main.microObjectsT.get(i).getSpeed();
                     if (event.getCode().equals(KeyCode.W)){
                         Main.microObjectsT.get(i).run(0,-1);
                     }
@@ -186,6 +185,7 @@ public class KeyPressHandler implements EventHandler<KeyEvent>{
                 if(unit.getActive()){
                     unit.changeActive();
                     unit.microWrapper.setStyle(" ");
+                    Main.showInfoActive(unit, false);
                 }
             }
 
@@ -193,6 +193,7 @@ public class KeyPressHandler implements EventHandler<KeyEvent>{
                 if(unit.getActive()){
                     unit.changeActive();
                     unit.microWrapper.setStyle(" ");
+                    Main.showInfoActive(unit, false);
                 }
             }
         }
@@ -242,6 +243,77 @@ public class KeyPressHandler implements EventHandler<KeyEvent>{
 
         if (event.getCode().equals(KeyCode.U)){
             Main.updateMiniMap();
+        }
+
+        if (event.getCode().equals(KeyCode.K)){
+            Dialog<Boolean> dialog = new Dialog<>();
+            dialog.setTitle("Key handling info");
+            Button button = new Button("OK");
+            Label V = new Label("V - use ability of 2&3 lvl units");
+            Label B = new Label("B - use berserk mode (All units)");
+            Label R = new Label("B - remove selected units");
+            Label U = new Label("U - update minimap");
+            Label C = new Label("C - sent all units to macro + enlarge speed");
+            Label ESCAPE = new Label("ESCAPE - cancel selection");
+            Label I = new Label("I - insert an unit");
+            Label WASD = new Label("WASD - move active unit/units");
+
+            GridPane dialogPane = new GridPane();
+
+            dialogPane.getRowConstraints().add(new RowConstraints(30));
+            dialogPane.getRowConstraints().add(new RowConstraints(30));
+            dialogPane.getRowConstraints().add(new RowConstraints(30));
+            dialogPane.getRowConstraints().add(new RowConstraints(30));
+            dialogPane.getRowConstraints().add(new RowConstraints(30));
+            dialogPane.getRowConstraints().add(new RowConstraints(30));
+            dialogPane.getRowConstraints().add(new RowConstraints(30));
+            dialogPane.getRowConstraints().add(new RowConstraints(30));
+            dialogPane.getRowConstraints().add(new RowConstraints(30));
+
+            dialogPane.getColumnConstraints().add(new ColumnConstraints(250));
+
+            dialogPane.add(WASD, 0, 0);
+            dialogPane.add(ESCAPE, 0, 1);
+            dialogPane.add(R, 0, 2);
+            dialogPane.add(I, 0, 3);
+            dialogPane.add(C, 0, 4);
+            dialogPane.add(U, 0, 5);
+            dialogPane.add(V, 0, 6);
+            dialogPane.add(B, 0, 7);
+            dialogPane.add(button, 0, 8);
+
+            dialogPane.setHalignment(WASD, HPos.CENTER);
+            dialogPane.setValignment(WASD, VPos.CENTER);
+            dialogPane.setHalignment(ESCAPE, HPos.CENTER);
+            dialogPane.setValignment(ESCAPE, VPos.CENTER);
+            dialogPane.setHalignment(R, HPos.CENTER);
+            dialogPane.setValignment(R, VPos.CENTER);
+            dialogPane.setHalignment(I, HPos.CENTER);
+            dialogPane.setValignment(I, VPos.CENTER);
+            dialogPane.setHalignment(C, HPos.CENTER);
+            dialogPane.setValignment(C, VPos.CENTER);
+            dialogPane.setHalignment(U, HPos.CENTER);
+            dialogPane.setValignment(U, VPos.CENTER);
+            dialogPane.setHalignment(V, HPos.CENTER);
+            dialogPane.setValignment(V, VPos.CENTER);
+            dialogPane.setHalignment(B, HPos.CENTER);
+            dialogPane.setValignment(B, VPos.CENTER);
+            dialogPane.setHalignment(button, HPos.RIGHT);
+            dialogPane.setValignment(button, VPos.CENTER);
+
+            dialogPane.setStyle("-fx-padding: 15px 0 0 75px;");
+
+            dialog.getDialogPane().setPrefSize(400, 300);
+            dialog.getDialogPane().getChildren().add(dialogPane);
+
+            button.setOnAction(new EventHandler<ActionEvent>() {
+                @Override
+                public void handle(ActionEvent actionEvent) {
+                    dialog.setResult(Boolean.TRUE);
+                }
+            });
+
+            dialog.showAndWait();
         }
 
         if (event.getCode().equals(KeyCode.V)){

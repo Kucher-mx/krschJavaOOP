@@ -1,8 +1,11 @@
 package sample;
 
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.application.Application;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
 import javafx.geometry.*;
 import javafx.scene.*;
@@ -10,7 +13,9 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.image.WritableImage;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.media.AudioClip;
@@ -22,9 +27,14 @@ import javafx.scene.Scene;
 import javafx.scene.paint.Color;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.*;
 import javafx.scene.shape.Rectangle;
+import javafx.util.Duration;
+
+import javax.imageio.ImageIO;
 
 public class Main extends Application {
 
@@ -73,7 +83,7 @@ public class Main extends Application {
         SpawnMicros(tLvls, "t");
         SpawnMicros(ctLvls, "ct");
 
-        root = new Group(group);
+//        root = new Group(group);
         scrollPane = new ScrollPane(group);
 
         scrollPane.setMaxWidth(Wallpaper.border.getWidth());
@@ -96,6 +106,9 @@ public class Main extends Application {
         layout2.getChildren().add(showInfoActiveGroup);
         layout2.setAlignment(showInfoActiveGroup, Pos.BOTTOM_CENTER);
         miniMapGroup.setStyle("-fx-padding: 0 20px 0 0");
+
+//        root = new Group();
+//        root.getChildren().addAll(group.getChildren());
 
         scene = new Scene(layout2, width, height);
         actualizeMiniMap();
@@ -224,6 +237,14 @@ public class Main extends Application {
             }
         };
 
+        Timeline timeline = new Timeline(
+                new KeyFrame(Duration.seconds(1), e -> {
+                    updateMiniMap();
+                })
+        );
+        timeline.setCycleCount(Timeline.INDEFINITE);
+        timeline.play();
+
         timer.start();
     }
 
@@ -329,6 +350,7 @@ public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception{
+        System.setProperty("quantum.multithreaded", "true");
         Main.primaryStage = primaryStage;
         Main.setSetupStage();
         primaryStage.show();

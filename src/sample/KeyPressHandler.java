@@ -162,12 +162,14 @@ public class KeyPressHandler implements EventHandler<KeyEvent>{
             for(MicroObject unit : Main.microObjectsCT){
                 if(unit.getActive()){
                     microsToDelete.add(unit);
+                    Main.showInfoActive(unit, false);
                 }
             }
 
             for(MicroObject unit : Main.microObjectsT){
                 if(unit.getActive()){
                     microsToDelete.add(unit);
+                    Main.showInfoActive(unit, false);
                 }
             }
 

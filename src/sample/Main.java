@@ -107,9 +107,6 @@ public class Main extends Application {
         layout2.setAlignment(showInfoActiveGroup, Pos.BOTTOM_CENTER);
         miniMapGroup.setStyle("-fx-padding: 0 20px 0 0");
 
-//        root = new Group();
-//        root.getChildren().addAll(group.getChildren());
-
         scene = new Scene(layout2, width, height);
         actualizeMiniMap();
         scene.setOnKeyPressed(new KeyPressHandler());

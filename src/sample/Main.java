@@ -1,11 +1,8 @@
 package sample;
 
-import javafx.animation.KeyFrame;
-import javafx.animation.Timeline;
 import javafx.application.Application;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
-import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
 import javafx.geometry.*;
 import javafx.scene.*;
@@ -13,13 +10,12 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
-import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.image.WritableImage;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.media.AudioClip;
 import javafx.scene.transform.Scale;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.animation.AnimationTimer;
 import javafx.event.EventHandler;
@@ -27,14 +23,9 @@ import javafx.scene.Scene;
 import javafx.scene.paint.Color;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.*;
 import javafx.scene.shape.Rectangle;
-import javafx.util.Duration;
-
-import javax.imageio.ImageIO;
 
 public class Main extends Application {
 
@@ -52,6 +43,8 @@ public class Main extends Application {
     static boolean berserkPressed = false;
     static boolean secondLvlAbility = false;
     public static boolean endOfTheGame = false;
+    public static boolean getA = false;
+    public static boolean getB = false;
 
     static AnimationTimer timer;
     static Group group = new Group();
@@ -67,15 +60,11 @@ public class Main extends Application {
     static Scale miniMapScale = new Scale();
     static Rectangle miniMapBoxView = new Rectangle();
 
-    static Group root;
+    static MiniMap minimap;
+    static Serealization serealization = new Serealization();
 
     static Group showInfoActiveGroup = new Group();
     static VBox showInfoActiveWrapper = new VBox();
-
-    //check framerate
-    public static final long[] frameTimes = new long[100];
-    public static int frameTimeIndex = 0 ;
-    public static boolean arrayFilled = false ;
 
     public static void setMainStage(double width, double height, ArrayList<String> ctLvls, ArrayList<String> tLvls) throws FileNotFoundException {
         SpawnWallpaper();
@@ -83,8 +72,8 @@ public class Main extends Application {
         SpawnMicros(tLvls, "t");
         SpawnMicros(ctLvls, "ct");
 
-//        root = new Group(group);
         scrollPane = new ScrollPane(group);
+        minimap = new MiniMap();
 
         scrollPane.setMaxWidth(Wallpaper.border.getWidth());
         scrollPane.setMaxHeight(Wallpaper.border.getHeight());
@@ -97,18 +86,17 @@ public class Main extends Application {
         miniMapScale.setX(0.1);
         miniMapScale.setY(0.1);
 
+
         layout2.getChildren().add(scrollPane);
-        layout2.getChildren().add(miniMapGroup);
-        layout2.setAlignment(miniMapGroup, Pos.TOP_RIGHT);
+        layout2.getChildren().add(minimap.getPane());
+        layout2.setAlignment(minimap.getPane(), Pos.TOP_RIGHT);
 
 
         showInfoActiveGroup.getChildren().add(showInfoActiveWrapper);
         layout2.getChildren().add(showInfoActiveGroup);
         layout2.setAlignment(showInfoActiveGroup, Pos.BOTTOM_CENTER);
-        miniMapGroup.setStyle("-fx-padding: 0 20px 0 0");
 
         scene = new Scene(layout2, width, height);
-        actualizeMiniMap();
         scene.setOnKeyPressed(new KeyPressHandler());
 
         primaryStage.setTitle("CS Clone");
@@ -149,22 +137,9 @@ public class Main extends Application {
             @Override
             public void handle(long now) {
 
-//                long oldFrameTime = frameTimes[frameTimeIndex] ;
-//                frameTimes[frameTimeIndex] = now ;
-//                frameTimeIndex = (frameTimeIndex + 1) % frameTimes.length ;
-//                if (frameTimeIndex == 0) {
-//                    arrayFilled = true ;
-//                }
-//                if (arrayFilled) {
-//                    long elapsedNanos = now - oldFrameTime ;
-//                    long elapsedNanosPerFrame = elapsedNanos / frameTimes.length ;
-//                    double frameRate = 1_000_000_000.0 / elapsedNanosPerFrame ;
-//                    System.out.println("Current frame rate: " + frameRate);
-//                }
-
                 if(!endOfTheGame){
-//                    updateMiniMap();
 
+                    minimap.updateMap();
                     Main.MoveMicro();
                     try {
                         Main.checkIntersectsMacro();
@@ -233,14 +208,6 @@ public class Main extends Application {
                 }
             }
         };
-
-        Timeline timeline = new Timeline(
-                new KeyFrame(Duration.seconds(1), e -> {
-                    updateMiniMap();
-                })
-        );
-        timeline.setCycleCount(Timeline.INDEFINITE);
-        timeline.play();
 
         timer.start();
     }
@@ -316,34 +283,7 @@ public class Main extends Application {
         }
     }
 
-    public static void updateMiniMap(){
-        miniMapGroup.getChildren().clear();
-        miniMapBoxView.setX(miniMapBoxView.getX());
-        miniMapBoxView.setY(miniMapBoxView.getY());
-        miniMapView.setFitWidth(370);
-        miniMapView.setFitHeight(300);
-        miniMapView = new ImageView(group.snapshot( null, null));
-        miniMapGroup.getChildren().add(miniMapView);
-        miniMapGroup.getChildren().add(miniMapBoxView);
-        miniMapBoxView.toFront();
-        miniMapView.getTransforms().add(miniMapScale);
-    }
 
-    public static void actualizeMiniMap() {
-        miniMapBoxView.setX(0);
-        miniMapBoxView.setY(0);
-        miniMapBoxView.setHeight(5);
-        miniMapBoxView.setWidth(5);
-        miniMapBoxView.setFill(Color.WHITE);
-        miniMapBoxView.setStroke(Color.NAVAJOWHITE);
-        miniMapView = new ImageView(group.snapshot( null, null));
-        miniMapView.setFitWidth(370);
-        miniMapView.setFitHeight(300);
-
-        miniMapGroup.getChildren().add(miniMapView);
-        miniMapGroup.getChildren().add(miniMapBoxView);
-        miniMapBoxView.toFront();
-    }
 
     @Override
     public void start(Stage primaryStage) throws Exception{
@@ -441,10 +381,10 @@ public class Main extends Application {
                     lastInvocationT = current;
                 }
 
-                if(!microT.getAlive()){
+                if(!microT.getAlive() && (!Main.getA || !Main.getB)){
                     Main.group.getChildren().remove(microT.microGroup);
                     microsToDelete.add(microT);
-                }else if(!microCT.getAlive()){
+                }else if(!microCT.getAlive() && (!Main.getA || !Main.getB)){
                     Main.group.getChildren().remove(microCT.microGroup);
                     microsToDelete.add(microCT);
                 }
@@ -470,6 +410,12 @@ public class Main extends Application {
                     checkGetMacro(site, "ct");
                     microsToRemove.add(micro);
                     micro.changeInMacro(true);
+                    minimap.deleteUnit(micro);
+                    if(site.getName().equals('a')){
+                        Main.getA = true;
+                    }else{
+                        Main.getB = true;
+                    }
                 }else{
                     micro.changeInMacro(false);
                 }
@@ -483,6 +429,12 @@ public class Main extends Application {
                     checkGetMacro(site, "t");
                     microsToRemove.add(micro);
                     micro.changeInMacro(true);
+                    minimap.deleteUnit(micro);
+                    if(site.getName().equals('a')){
+                        Main.getA = true;
+                    }else{
+                        Main.getB = true;
+                    }
                 }else{
                     micro.changeInMacro(false);
                 }
@@ -496,6 +448,22 @@ public class Main extends Application {
                 Main.microObjectsCT.remove(delete);
             }
         }
+    }
+
+    public static void serealize(){
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Open Resource File");
+        File file = fileChooser.showOpenDialog(Main.primaryStage);
+
+        Serealization.serializeNow(file);
+    }
+
+    public static void deserealize(){
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Open Resource File");
+        File file = fileChooser.showOpenDialog(Main.primaryStage);
+
+        Serealization.deserializeNow(file);
     }
 
     public static void checkWin(){

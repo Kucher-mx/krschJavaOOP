@@ -17,7 +17,7 @@ import java.util.LinkedList;
 import java.util.Queue;
 
 public class MacroObjSpawn {
-    private final String name;
+    private String name;
     Queue ct = new LinkedList();
     Queue t = new LinkedList();
 
@@ -26,6 +26,11 @@ public class MacroObjSpawn {
     protected Label spawnLabel = new Label();
     protected Image spawnImage;
     protected ImageView spawnImageView;
+
+    public String getName(){
+        System.out.println("return " + this.name);
+        return this.name;
+    }
 
     public MacroObjSpawn(String name) throws FileNotFoundException {
         this.name = name;

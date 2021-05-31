@@ -9,13 +9,12 @@ import javafx.scene.layout.*;
 import javafx.scene.media.AudioClip;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
-import java.io.File;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
+import java.io.*;
+
 import java.util.*;
 
-public class MicroObject implements Comparable<MicroObject>, Cloneable {
+public class MicroObject implements Comparable<MicroObject>, Cloneable, Serializable {
     private String characterSite;
     public int characterLevel;
     private double characterSpeed;
@@ -35,12 +34,12 @@ public class MicroObject implements Comparable<MicroObject>, Cloneable {
     public double defaultSpeed;
     public int defaultDamage;
 
-    protected GridPane microWrapper = new GridPane();
-    protected Rectangle healthBar = new Rectangle();
-    protected Label microLabel;
-    protected Group microGroup;
-    protected Image microImage;
-    protected ImageView microImageView;
+    protected transient GridPane microWrapper = new GridPane();
+    protected transient Rectangle healthBar = new Rectangle();
+    protected transient Label microLabel;
+    protected transient Group microGroup;
+    protected transient Image microImage;
+    protected transient ImageView microImageView;
     public static int idCounter = 0;
 
     public int getLvl(){
@@ -370,6 +369,22 @@ public class MicroObject implements Comparable<MicroObject>, Cloneable {
 
     public void changeHp(int hp){
         this.characterHp = hp;
+    }
+
+    public void Save( FileWriter fileWriter ) throws IOException
+    {
+        fileWriter.write( Double.toString(this.getX()) );
+        fileWriter.write("\n");
+        fileWriter.write( Double.toString(this.getY()) );
+        fileWriter.write("\n");
+//        fileWriter.write( Double.toString(this.getTranslateX()) );
+//        fileWriter.write("\n");
+//        fileWriter.write( Double.toString(this.getTranslateY()) );
+//        fileWriter.write("\n");
+        fileWriter.write( this.getSide() );
+        fileWriter.write("\n");
+//        fileWriter.write( Integer.toString(this.count) );
+//        fileWriter.write("\n");
     }
 
     @Override

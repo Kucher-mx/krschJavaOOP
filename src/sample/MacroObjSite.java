@@ -9,11 +9,10 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
+import java.io.*;
 import java.util.*;
 
-public class MacroObjSite {
+public class MacroObjSite implements Serializable {
     public long timeStartedCT;
     public long timeStartedT;
     private String name;
@@ -21,14 +20,14 @@ public class MacroObjSite {
     Queue<MicroObject> ct = new LinkedList<>();
     Queue<MicroObject> t = new LinkedList<>();
 
-    protected GridPane siteWrapper = new GridPane();
-    protected VBox imgWrap = new VBox();
-    protected Image getImg;
-    protected ImageView getImgView;
-    protected Label siteLabel = new Label();
-    protected Group siteGroup = new Group();
-    protected Image siteImage;
-    protected ImageView siteImageView;
+    protected transient GridPane siteWrapper = new GridPane();
+    public transient VBox imgWrap = new VBox();
+    protected transient Image getImg;
+    public transient ImageView getImgView;
+    protected transient Label siteLabel = new Label();
+    protected transient Group siteGroup;
+    protected transient Image siteImage;
+    public transient ImageView siteImageView;
 
     public String getName(){
         return this.name;
@@ -107,13 +106,16 @@ public class MacroObjSite {
                 Iterator ctIterator = ct.iterator();
                 while (ctIterator.hasNext()) {
                     MicroObject unitCT = (MicroObject) ctIterator.next();
-                    Main.microObjectsCT.add(unitCT);
-                    unitCT.setXCoord(2100 + Main.random.nextInt(100));
-                    unitCT.setYCoord(420 + Main.random.nextInt(75));
-                    unitCT.microWrapper.setTranslateX(unitCT.getX());
-                    unitCT.microWrapper.setTranslateY(unitCT.getY());
-                    unitCT.setSpeed(unitCT.defaultSpeed);
-                    unitCT.microWrapper.setStyle(" ");
+                    if(unitCT.getAlive()){
+                        Main.minimap.addUnit(unitCT);
+                        Main.microObjectsCT.add(unitCT);
+                        unitCT.setXCoord(2100 + Main.random.nextInt(100));
+                        unitCT.setYCoord(420 + Main.random.nextInt(75));
+                        unitCT.microWrapper.setTranslateX(unitCT.getX());
+                        unitCT.microWrapper.setTranslateY(unitCT.getY());
+                        unitCT.setSpeed(unitCT.defaultSpeed);
+                        unitCT.microWrapper.setStyle(" ");
+                    }
                     if(unitCT.getActive()){
                         unitCT.changeActive();
                     }
@@ -126,6 +128,9 @@ public class MacroObjSite {
                 }
                 ct.clear();
                 Main.toMacro = false;
+                Main.getA = false;
+                Main.getB = false;
+                Main.minimap.updateSite(this, "ct");
                 this.timeStartedCT = 0;
             }
         }else if(side.equals("t")){
@@ -145,22 +150,28 @@ public class MacroObjSite {
 
                 while (tIterator.hasNext()) {
                     MicroObject unitT = (MicroObject) tIterator.next();
-                    unitT.microWrapper.setStyle(" ");
+                    if(unitT.getAlive()){
+                        unitT.microWrapper.setStyle(" ");
+                        Main.microObjectsT.add(unitT);
+                        unitT.setXCoord(1060.0 + Main.random.nextInt(100));
+                        unitT.setYCoord(2570.0 + Main.random.nextInt(50));
+                        unitT.microWrapper.setTranslateX(unitT.getX());
+                        unitT.microWrapper.setTranslateY(unitT.getY());
+                        unitT.setSpeed(unitT.defaultSpeed);
+                        Main.minimap.addUnit(unitT);
+                    }
                     if(unitT.getActive()){
                         unitT.changeActive();
                     }
-                    unitT.setXCoord(1060.0 + Main.random.nextInt(100));
-                    unitT.setYCoord(2570.0 + Main.random.nextInt(50));
-                    Main.microObjectsT.add(unitT);
                     if(!Main.group.getChildren().contains(unitT.microGroup)){
                         Main.group.getChildren().add(unitT.microGroup);
                     }
-                    unitT.microWrapper.setTranslateX(unitT.getX());
-                    unitT.microWrapper.setTranslateY(unitT.getY());
-                    unitT.setSpeed(unitT.defaultSpeed);
                 }
                 t.clear();
                 Main.toMacro = false;
+                Main.getA = false;
+                Main.getB = false;
+                Main.minimap.updateSite(this, "t");
                 this.timeStartedT = 0;
             }
         }
@@ -232,6 +243,22 @@ public class MacroObjSite {
                 "-fx-border-radius: 5;" +
                 "-fx-border-color: blue;");
         this.siteGroup = new Group(siteWrapper);
+    }
+
+    public void Save( FileWriter fileWriter ) throws IOException
+    {
+        fileWriter.write( this.getName() );
+        fileWriter.write("\n");
+        fileWriter.write( this.getBelong() );
+        fileWriter.write("\n");
+//        fileWriter.write( Double.toString(this.getTranslateX()) );
+//        fileWriter.write("\n");
+//        fileWriter.write( Double.toString(this.getTranslateY()) );
+//        fileWriter.write("\n");
+//        fileWriter.write( this.getSide() );
+//        fileWriter.write("\n");
+//        fileWriter.write( Integer.toString(this.count) );
+//        fileWriter.write("\n");
     }
 
     public void addCt(MicroObject obj) {

@@ -7,7 +7,7 @@ import java.util.LinkedList;
 import java.util.UUID;
 
 public class universal {
-    Scanner in = new Scanner(System.in);
+    transient Scanner in = new Scanner(System.in);
     private int teamSize;
     LinkedList microObjectsT  = new LinkedList();
     LinkedList microObjectsCT  = new LinkedList();

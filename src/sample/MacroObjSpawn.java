@@ -28,7 +28,6 @@ public class MacroObjSpawn {
     protected ImageView spawnImageView;
 
     public String getName(){
-        System.out.println("return " + this.name);
         return this.name;
     }
 

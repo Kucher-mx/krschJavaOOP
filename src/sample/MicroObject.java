@@ -40,7 +40,7 @@ public class MicroObject implements Comparable<MicroObject>, Cloneable, Serializ
     protected transient Group microGroup;
     protected transient Image microImage;
     protected transient ImageView microImageView;
-    public static int idCounter = 0;
+    public transient static int idCounter = 0;
 
     public int getLvl(){
         return this.characterLevel;
@@ -224,6 +224,89 @@ public class MicroObject implements Comparable<MicroObject>, Cloneable, Serializ
         MicroObject.idCounter++;
     }
 
+    public MicroObject(String side, double destX, double destY, double coordX, double coordY, int hp) throws FileNotFoundException {
+        this.characterSite = side;
+        this.characterLevel = 1;
+        this.characterSpeed = 20;
+        defaultSpeed = 20;
+        this.damage = 5;
+        this.defaultDamage = 5;
+        this.characterKevlar = 0;
+        this.characterHp = hp;
+        this.id = MicroObject.idCounter;
+        this.destinationX = destX;
+        this.destinationY = destY;
+
+        this.microLabel = new Label("Lvl: 1, hp: "  + this.getHp());
+        if(side.equals("t")){
+            this.charCordsX = coordX;
+            this.charCordsY = coordY;
+
+            this.microWrapper.getRowConstraints().add(new RowConstraints(100));
+            this.microWrapper.getRowConstraints().add(new RowConstraints(35));
+            this.microWrapper.getRowConstraints().add(new RowConstraints(1));
+            this.microWrapper.getRowConstraints().add(new RowConstraints(5));
+
+            this.microWrapper.getColumnConstraints().add(new ColumnConstraints(100));
+
+            microImage = new Image(new FileInputStream("src/source/t_1.png"));
+            this.microImageView = new ImageView(microImage);
+
+            this.microWrapper.setTranslateX(this.charCordsX);
+            this.microWrapper.setTranslateY(this.charCordsY);
+        }else{
+            this.charCordsX = coordX;
+            this.charCordsY = coordY;
+
+            microImage = new Image(new FileInputStream("src/source/ct_1.png"));
+            this.microImageView = new ImageView(microImage);
+
+            this.microWrapper.setTranslateX(this.charCordsX);
+            this.microWrapper.setTranslateY(this.charCordsY);
+        }
+        this.microLabel.setStyle("-fx-border-color: white; -fx-padding: 3px");
+        this.microLabel.setTextFill(Color.WHITE);
+        this.microImageView.setPreserveRatio(true);
+        this.microImageView.setFitHeight(100.0);
+        this.microImageView.setFitWidth(90.0);
+        Rectangle setFit = new Rectangle();
+        setFit.setWidth(100);
+        setFit.setHeight(1);
+        setFit.setFill(Color.TRANSPARENT);
+
+        healthBar.setHeight(5);
+        healthBar.setWidth(100);
+        healthBar.setFill(Color.RED);
+
+        this.microWrapper.setOnMouseClicked((event) -> {
+            this.changeActive();
+            if(this.getActive()) {
+                String styleWrapper = "-fx-border-color: yellow;"
+                        + "-fx-border-width: 1;"
+                        + "-fx-border-style: solid;";
+                this.microWrapper.setStyle(styleWrapper);
+                Main.showInfoActive(this, true);
+            }else {
+                this.microWrapper.setStyle(" ");
+                Main.showInfoActive(this, false);
+            }
+        });
+
+        microWrapper.setHalignment(this.microImageView, HPos.RIGHT);
+        microWrapper.setValignment(this.microImageView, VPos.CENTER);
+        microWrapper.setHalignment(this.microLabel, HPos.CENTER);
+        microWrapper.setValignment(this.microLabel, VPos.CENTER);
+
+        microWrapper.add(this.microImageView, 0, 0);
+        microWrapper.add(this.microLabel, 0, 1);
+        microWrapper.add(setFit, 0, 2);
+        microWrapper.add(this.healthBar, 0, 3);
+
+        this.microGroup = new Group(this.microWrapper);
+
+        MicroObject.idCounter++;
+    }
+
     public void interactInMacro(MicroObject enemy){
         if(!(enemy.getHp() <= 7)){
             enemy.getDamage(this);
@@ -236,14 +319,6 @@ public class MicroObject implements Comparable<MicroObject>, Cloneable, Serializ
         }else{
             this.changeAlive();
         }
-    }
-
-    public void print(){
-        System.out.println("Object's site: " + this.characterSite +
-                " his HP and Armour: " + this.characterHp + ", " + this.characterKevlar +
-                " he can damage to " + this.damage + "HP" +
-                " his lvl is: " + this.characterLevel //+ " id: " + this.objId
-        );
     }
 
     public void run(double x, double y){
@@ -367,32 +442,34 @@ public class MicroObject implements Comparable<MicroObject>, Cloneable, Serializ
         System.out.println("Follow this advice: " + msg);
     }
 
-    public void changeHp(int hp){
-        this.characterHp = hp;
-    }
+    //serialize to txt
+    public void Save( FileWriter fileWriter ) throws IOException{
+        fileWriter.write( Integer.toString(this.getLvl()));
+        fileWriter.write("\n");
 
-    public void Save( FileWriter fileWriter ) throws IOException
-    {
-        fileWriter.write( Double.toString(this.getX()) );
+        fileWriter.write( Integer.toString(this.id));
         fileWriter.write("\n");
-        fileWriter.write( Double.toString(this.getY()) );
+
+        fileWriter.write( Double.toString(this.getX()));
         fileWriter.write("\n");
-//        fileWriter.write( Double.toString(this.getTranslateX()) );
-//        fileWriter.write("\n");
-//        fileWriter.write( Double.toString(this.getTranslateY()) );
-//        fileWriter.write("\n");
-        fileWriter.write( this.getSide() );
+
+        fileWriter.write( Double.toString(this.getY()));
         fileWriter.write("\n");
-//        fileWriter.write( Integer.toString(this.count) );
-//        fileWriter.write("\n");
+
+        fileWriter.write( Double.toString(this.getXDest()));
+        fileWriter.write("\n");
+
+        fileWriter.write( Double.toString(this.getYDest()));
+        fileWriter.write("\n");
+
+        fileWriter.write(this.getSide());
+        fileWriter.write("\n");
     }
 
     @Override
     public boolean equals(Object obj) {
-//        if (obj == null || getClass() != obj.getClass()) return false;
         MicroObject character = (MicroObject) obj;
         return this.id == character.id;
-//        return ((this.getLvl() == (character.getLvl())) && (this.getHp() == character.getHp()));
     }
 
     @Override

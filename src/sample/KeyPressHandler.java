@@ -10,9 +10,7 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.RowConstraints;
-
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.ArrayList;
 
 public class KeyPressHandler implements EventHandler<KeyEvent>{
@@ -146,6 +144,7 @@ public class KeyPressHandler implements EventHandler<KeyEvent>{
                             spawnLabel.setText("Choose char.");
                             dialog.show();
                         }
+                        Main.minimap.addUnit(createdMicro);
                         Main.group.getChildren().add(createdMicro.microGroup);
                     } catch (FileNotFoundException e) {
                         e.printStackTrace();
@@ -253,8 +252,6 @@ public class KeyPressHandler implements EventHandler<KeyEvent>{
             Label V = new Label("V - use ability of 2&3 lvl units");
             Label B = new Label("B - use berserk mode (All units)");
             Label R = new Label("B - remove selected units");
-            Label P = new Label("P - serialize");
-            Label O = new Label("O - deserialize");
             Label C = new Label("C - sent all units to macro + enlarge speed");
             Label ESCAPE = new Label("ESCAPE - cancel selection");
             Label I = new Label("I - insert an unit");
@@ -262,8 +259,6 @@ public class KeyPressHandler implements EventHandler<KeyEvent>{
 
             GridPane dialogPane = new GridPane();
 
-            dialogPane.getRowConstraints().add(new RowConstraints(30));
-            dialogPane.getRowConstraints().add(new RowConstraints(30));
             dialogPane.getRowConstraints().add(new RowConstraints(30));
             dialogPane.getRowConstraints().add(new RowConstraints(30));
             dialogPane.getRowConstraints().add(new RowConstraints(30));
@@ -280,8 +275,6 @@ public class KeyPressHandler implements EventHandler<KeyEvent>{
             dialogPane.add(R, 0, 2);
             dialogPane.add(I, 0, 3);
             dialogPane.add(C, 0, 4);
-            dialogPane.add(P, 0, 5);
-            dialogPane.add(O, 0, 6);
             dialogPane.add(V, 0, 7);
             dialogPane.add(B, 0, 8);
             dialogPane.add(button, 0, 9);
@@ -296,10 +289,6 @@ public class KeyPressHandler implements EventHandler<KeyEvent>{
             dialogPane.setValignment(I, VPos.CENTER);
             dialogPane.setHalignment(C, HPos.CENTER);
             dialogPane.setValignment(C, VPos.CENTER);
-            dialogPane.setHalignment(P, HPos.CENTER);
-            dialogPane.setValignment(P, VPos.CENTER);
-            dialogPane.setHalignment(O, HPos.CENTER);
-            dialogPane.setValignment(O, VPos.CENTER);
             dialogPane.setHalignment(V, HPos.CENTER);
             dialogPane.setValignment(V, VPos.CENTER);
             dialogPane.setHalignment(B, HPos.CENTER);
@@ -324,16 +313,6 @@ public class KeyPressHandler implements EventHandler<KeyEvent>{
 
         if (event.getCode().equals(KeyCode.V)){
             Main.secondLvlAbility = true;
-        }
-
-        if (event.getCode().equals(KeyCode.P)){
-            // serialize
-            Main.serealize();
-        }
-
-        if (event.getCode().equals(KeyCode.O)){
-            // deserialize
-            Main.deserealize();
         }
     }
 }

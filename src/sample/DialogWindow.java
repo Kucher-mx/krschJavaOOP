@@ -15,21 +15,17 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.RowConstraints;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontPosture;
 import javafx.scene.text.FontWeight;
-import javafx.scene.text.Text;
-
 import java.awt.*;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 
 public class DialogWindow {
-    //Creating a dialog
     public Dialog<String> dialog = new Dialog<String>();
     private Group dialogGroup;
     private Label labelWindow;
@@ -46,13 +42,29 @@ public class DialogWindow {
         textField.maxWidth(150.0);
         Button button = new Button("Confirm");
 
+        Button load = new Button("Load save");
+
         pane.getColumnConstraints().add(new ColumnConstraints(200));
         pane.getColumnConstraints().add(new ColumnConstraints(175));
         pane.getColumnConstraints().add(new ColumnConstraints(100));
         pane.getRowConstraints().add(new RowConstraints(100));
+        pane.getRowConstraints().add(new RowConstraints(50));
 
         GridPane.setHalignment(button, HPos.CENTER);
-//        pane.setGridLinesVisible(true);
+
+        load.setOnAction(new EventHandler<ActionEvent>() {
+
+            @Override
+            public void handle(ActionEvent e) {
+                try {
+                    Main.deserealize();
+                } catch (IOException ioException) {
+                    ioException.printStackTrace();
+                } catch (ClassNotFoundException classNotFoundException) {
+                    classNotFoundException.printStackTrace();
+                }
+            }
+        });
 
         button.setOnAction(new EventHandler<ActionEvent>() {
 
@@ -131,12 +143,15 @@ public class DialogWindow {
                                 }
                             }
 
+                            for(String str : ctLvls){
+                                System.out.println(str);
+                            }
+
                             Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
                             double  width = screenSize.getWidth();
                             double height = screenSize.getHeight();
-                            System.out.println(width + " " + height);
                             try {
-                                Main.setMainStage(width, height, ctLvls, tLvls);
+                                Main.setMainStage(width, height, ctLvls, tLvls, false);
                             } catch (FileNotFoundException fileNotFoundException) {
                                 fileNotFoundException.printStackTrace();
                             }
@@ -153,6 +168,8 @@ public class DialogWindow {
         pane.add(labelWindow, 0, 0);
         pane.add(textField, 1, 0);
         pane.add(button, 2, 0);
+
+        pane.add(load, 2, 1);
         dialogGroup.getChildren().add(pane);
     }
 

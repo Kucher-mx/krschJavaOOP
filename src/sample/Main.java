@@ -6,14 +6,12 @@ import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.geometry.*;
 import javafx.scene.*;
-import javafx.scene.control.Button;
-import javafx.scene.control.Dialog;
-import javafx.scene.control.Label;
-import javafx.scene.control.ScrollPane;
+import javafx.scene.control.*;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.media.AudioClip;
+import javafx.scene.text.Font;
 import javafx.scene.transform.Scale;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
@@ -24,6 +22,8 @@ import javafx.scene.paint.Color;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.*;
 import javafx.scene.shape.Rectangle;
 
@@ -47,6 +47,7 @@ public class Main extends Application {
     public static boolean getB = false;
 
     static AnimationTimer timer;
+
     static Group group = new Group();
     static Scene scene;
     static StackPane layout2;
@@ -60,20 +61,107 @@ public class Main extends Application {
     static Scale miniMapScale = new Scale();
     static Rectangle miniMapBoxView = new Rectangle();
 
+    static HBox topMenu = new HBox();
+    static VBox topMenuWrapper = new VBox();
+    static Label microCt = new Label();
+    static Label microT = new Label();
+    static Label macroAInfo = new Label();
+    static Label macroBInfo = new Label();
+
     static MiniMap minimap;
-    static Serealization serealization = new Serealization();
 
     static Group showInfoActiveGroup = new Group();
     static VBox showInfoActiveWrapper = new VBox();
 
-    public static void setMainStage(double width, double height, ArrayList<String> ctLvls, ArrayList<String> tLvls) throws FileNotFoundException {
+    public static void setMainStage(double width, double height, ArrayList<String> ctLvls, ArrayList<String> tLvls, boolean load) throws FileNotFoundException {
         SpawnWallpaper();
-        SpawnMacros();
-        SpawnMicros(tLvls, "t");
-        SpawnMicros(ctLvls, "ct");
+
+        if(load){
+
+            for (MacroObjSite site : Main.sites){
+                site.printTeamCT();
+                site.printTeamT();
+            }
+
+            ArrayList<MicroObject> temp = new ArrayList<MicroObject>();
+
+            for(MicroObject unit : Main.microObjectsCT){
+                switch (unit.getLvl()){
+                    case 1:
+                        temp.add(new MicroObject(unit.getSide(), unit.getXDest(), unit.getYDest(), unit.getX(), unit.getY(), unit.getHp()));
+                        break;
+                    case 2:
+                        temp.add(new MicroObjectOne(unit.getSide(), unit.getXDest(), unit.getYDest(), unit.getX(), unit.getY(), unit.getHp()));
+                        break;
+                    case 3:
+                        temp.add(new MicroObjectTwo(unit.getSide(), unit.getXDest(), unit.getYDest(), unit.getX(), unit.getY(), unit.getHp()));
+                        break;
+                }
+            }
+
+            Main.microObjectsCT.clear();
+            for(MicroObject ct : temp){
+                Main.microObjectsCT.add(ct);
+            }
+            temp.clear();
+
+            for(MicroObject unit : Main.microObjectsT){
+                switch (unit.getLvl()){
+                    case 1:
+                        temp.add(new MicroObject(unit.getSide(), unit.getXDest(), unit.getYDest(), unit.getX(), unit.getY(), unit.getHp()));
+                        break;
+                    case 2:
+                        temp.add(new MicroObjectOne(unit.getSide(), unit.getXDest(), unit.getYDest(), unit.getX(), unit.getY(), unit.getHp()));
+                        break;
+                    case 3:
+                        temp.add(new MicroObjectTwo(unit.getSide(), unit.getXDest(), unit.getYDest(), unit.getX(), unit.getY(), unit.getHp()));
+                        break;
+                }
+            }
+
+            Main.microObjectsT.clear();
+            for(MicroObject t : temp){
+                Main.microObjectsT.add(t);
+            }
+            temp.clear();
+
+
+            ArrayList<MacroObjSite> sitesArrayList = new ArrayList<MacroObjSite>();
+            for(MacroObjSite site : Main.sites){
+                sitesArrayList.add(new MacroObjSite(site.getName(), site.getBelong(), site.timeStartedCT, site.timeStartedT));
+            }
+
+            int sitesIterator = 0;
+            Arrays.fill(Main.sites, null);
+            for(MacroObjSite site : sitesArrayList){
+                Main.sites[sitesIterator] = site;
+                sitesIterator++;
+            }
+
+            SpawnMacros(false);
+
+            for (MicroObject micro : Main.microObjectsCT){
+                group.getChildren().add(micro.microGroup);
+            }
+
+            for (MicroObject micro : Main.microObjectsT){
+                group.getChildren().add(micro.microGroup);
+            }
+
+        }else{
+            SpawnMacros(true);
+            SpawnMicros(tLvls, "t");
+            SpawnMicros(ctLvls, "ct");
+        }
 
         scrollPane = new ScrollPane(group);
         minimap = new MiniMap();
+
+        for (MacroObjSite site : Main.sites){
+            if(!site.getBelong().equals("none")){
+                Main.minimap.updateSite(site, site.getBelong());
+            }
+        }
 
         scrollPane.setMaxWidth(Wallpaper.border.getWidth());
         scrollPane.setMaxHeight(Wallpaper.border.getHeight());
@@ -86,11 +174,65 @@ public class Main extends Application {
         miniMapScale.setX(0.1);
         miniMapScale.setY(0.1);
 
-
         layout2.getChildren().add(scrollPane);
         layout2.getChildren().add(minimap.getPane());
         layout2.setAlignment(minimap.getPane(), Pos.TOP_RIGHT);
 
+        Button save = new Button("Save");
+        Button edit = new Button("Edit");
+
+        save.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent actionEvent) {
+                try {
+                    if(Main.sites[0].t.size() > 0 || Main.sites[0].ct.size() > 0 || Main.sites[1].t.size() > 0 || Main.sites[1].ct.size() > 0){
+                        Alert a = new Alert(Alert.AlertType.ERROR);
+                        a.setTitle("Save error");
+                        a.setContentText("Can not save while interaction in macro");
+
+                        a.show();
+                        return;
+                    }
+
+                    Main.sites[0].t.clear();
+                    Main.sites[0].ct.clear();
+                    Main.sites[1].t.clear();
+                    Main.sites[1].ct.clear();
+                    Main.serealize();
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+
+        topMenu.getChildren().addAll(save, edit);
+
+        topMenuWrapper.getChildren().add(topMenu);
+        topMenuWrapper.getChildren().add(microCt);
+        topMenuWrapper.getChildren().add(microT);
+        topMenuWrapper.getChildren().add(macroAInfo);
+        topMenuWrapper.getChildren().add(macroBInfo);
+
+        microCt.setFont(new Font(14));
+        microT.setFont(new Font(14));
+        macroAInfo.setFont(new Font(14));
+        macroBInfo.setFont(new Font(14));
+        microCt.setTextFill(Color.WHITE);
+        microT.setTextFill(Color.WHITE);
+        macroAInfo.setTextFill(Color.WHITE);
+        macroBInfo.setTextFill(Color.WHITE);
+
+        topMenuWrapper.setMaxHeight(150);
+        topMenuWrapper.setMaxWidth(130);
+        topMenuWrapper.setStyle("-fx-border-color: yellow;");
+
+        topMenuWrapper.setAlignment(Pos.TOP_CENTER);
+        topMenuWrapper.setSpacing(10);
+        topMenu.setAlignment(Pos.CENTER);
+        topMenu.setSpacing(10);
+
+        layout2.getChildren().add(topMenuWrapper);
+        layout2.setAlignment(topMenuWrapper, Pos.TOP_LEFT);
 
         showInfoActiveGroup.getChildren().add(showInfoActiveWrapper);
         layout2.getChildren().add(showInfoActiveGroup);
@@ -133,13 +275,197 @@ public class Main extends Application {
             }
         });
 
-    timer = new AnimationTimer() {
+        timer = new AnimationTimer() {
             @Override
             public void handle(long now) {
 
                 if(!endOfTheGame){
 
                     minimap.updateMap();
+                    Main.updateGlobalLabels();
+                    Main.MoveMicro();
+                    try {
+                        Main.checkIntersectsMacro();
+                    } catch (FileNotFoundException e) {
+                        e.printStackTrace();
+                    }
+
+                    try {
+                        Main.checkIntersectsMicro();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+
+                    if(berserkTimeEnd + 30000 <= new Date().getTime()){
+                        if(berserkPressed){
+                            berserkHandle();
+                        }else {
+                            interval = 250;
+                            for(MicroObject micro : microObjectsCT){
+                                micro.setDamage(micro.defaultDamage);
+                                micro.microLabel.setTextFill(Color.WHITE);
+                            }
+
+                            for(MicroObject micro : microObjectsT){
+                                micro.setDamage(micro.defaultDamage);
+                                micro.microLabel.setTextFill(Color.WHITE);
+                            }
+                        }
+                    }
+
+                    if(secondLvlAbilityTimeEnd + 30000 <= new Date().getTime()){
+                        if(secondLvlAbility){
+                            secondLvlAbilityHandle();
+                        }else {
+                            for(MicroObject micro : microObjectsCT){
+                                micro.setSpeed(micro.defaultSpeed);
+                                micro.microLabel.setStyle("-fx-border-color: white; -fx-padding: 3px");
+                            }
+
+                            for(MicroObject micro : microObjectsT){
+                                micro.microLabel.setStyle("-fx-border-color: white; -fx-padding: 3px");
+                                micro.setSpeed(micro.defaultSpeed);
+                            }
+                        }
+                    }
+
+
+
+                    try {
+                        if(sites[1].ct.size() > 0){
+                            checkGetMacro(sites[1], "ct");
+                        }else if(sites[1].t.size() > 0){
+                            checkGetMacro(sites[1], "t");
+                        }
+
+                        if(sites[0].ct.size() > 0){
+                            checkGetMacro(sites[0], "ct");
+                        }else if(sites[0].t.size() > 0){
+                            checkGetMacro(sites[0], "t");
+                        }
+                    } catch (FileNotFoundException e) {
+                        e.printStackTrace();
+                    }
+
+                    checkWin();
+                }
+            }
+        };
+
+        timer.start();
+    }
+
+    public static void setUpMainStage(double width, double height) throws FileNotFoundException {
+        scrollPane = new ScrollPane(group);
+        minimap = new MiniMap();
+
+        scrollPane.setMaxWidth(Wallpaper.border.getWidth());
+        scrollPane.setMaxHeight(Wallpaper.border.getHeight());
+
+        scrollPane.setFitToHeight(true);
+        scrollPane.setFitToWidth(true);
+
+        layout2 = new StackPane();
+
+        miniMapScale.setX(0.1);
+        miniMapScale.setY(0.1);
+
+        layout2.getChildren().add(scrollPane);
+        layout2.getChildren().add(minimap.getPane());
+        layout2.setAlignment(minimap.getPane(), Pos.TOP_RIGHT);
+
+        Button save = new Button("Save");
+        Button edit = new Button("Edit");
+
+        save.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent actionEvent) {
+                try {
+                    Main.serealize();
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+
+        topMenu.getChildren().addAll(save, edit);
+
+        topMenuWrapper.getChildren().add(topMenu);
+        topMenuWrapper.getChildren().add(microCt);
+        topMenuWrapper.getChildren().add(microT);
+        topMenuWrapper.getChildren().add(macroAInfo);
+        topMenuWrapper.getChildren().add(macroBInfo);
+
+        microCt.setFont(new Font(14));
+        microT.setFont(new Font(14));
+        macroAInfo.setFont(new Font(14));
+        macroBInfo.setFont(new Font(14));
+        microCt.setTextFill(Color.WHITE);
+        microT.setTextFill(Color.WHITE);
+        macroAInfo.setTextFill(Color.WHITE);
+        macroBInfo.setTextFill(Color.WHITE);
+
+        topMenuWrapper.setMaxHeight(150);
+        topMenuWrapper.setMaxWidth(130);
+        topMenuWrapper.setStyle("-fx-border-color: yellow;");
+
+        topMenuWrapper.setAlignment(Pos.TOP_CENTER);
+        topMenuWrapper.setSpacing(10);
+        topMenu.setAlignment(Pos.CENTER);
+        topMenu.setSpacing(10);
+
+        layout2.getChildren().add(topMenuWrapper);
+        layout2.setAlignment(topMenuWrapper, Pos.TOP_LEFT);
+
+        showInfoActiveGroup.getChildren().add(showInfoActiveWrapper);
+        layout2.getChildren().add(showInfoActiveGroup);
+        layout2.setAlignment(showInfoActiveGroup, Pos.BOTTOM_CENTER);
+
+        scene = new Scene(layout2, width, height);
+        scene.setOnKeyPressed(new KeyPressHandler());
+
+        primaryStage.setTitle("CS Clone");
+        primaryStage.setScene(scene);
+
+        miniMapGroup.setOnMousePressed(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                double x = event.getX();
+                double y = event.getY();
+
+                miniMapBoxView.setX(x);
+                miniMapBoxView.setY(y);
+
+                double posX = ( (x) / (3700*0.1) * 3700);
+                double posY = ( (y) / (3000*0.1) * 3000);
+                scrollPane.setVvalue(posY / 2700);
+                scrollPane.setHvalue(posX / 3200);
+            }
+        });
+
+
+        scrollPane.vvalueProperty().addListener(new ChangeListener<Number>() {
+            @Override
+            public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
+                miniMapBoxView.setY(scrollPane.getVvalue() * 300 - 5);
+            }
+        });
+
+        scrollPane.hvalueProperty().addListener(new ChangeListener<Number>() {
+            @Override
+            public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
+                miniMapBoxView.setX(scrollPane.getHvalue() * 370 - 5);
+            }
+        });
+
+        timer = new AnimationTimer() {
+            @Override
+            public void handle(long now) {
+
+                if(!endOfTheGame){
+
+                    minimap.updateMap();
+                    Main.updateGlobalLabels();
                     Main.MoveMicro();
                     try {
                         Main.checkIntersectsMacro();
@@ -216,6 +542,13 @@ public class Main extends Application {
         dialogWindow = new DialogWindow();
         Main.primaryStage.setTitle("Cs Clone Dialog");
         Main.primaryStage.setScene(dialogWindow.returnDialogScene());
+    }
+
+    public static void updateGlobalLabels(){
+        microCt.setText("ct alive: " + (Main.microObjectsCT.size() + Main.sites[0].ct.size() + Main.sites[1].ct.size()));
+        microT.setText("t alive: " + (Main.microObjectsT.size() + Main.sites[0].t.size() + Main.sites[1].t.size()));
+        macroAInfo.setText("A belongs to: " + Main.sites[0].getBelong());
+        macroBInfo.setText("B belongs to: " + Main.sites[1].getBelong());
     }
 
     public static void showInfoActive(MicroObject unit, boolean add){
@@ -302,20 +635,33 @@ public class Main extends Application {
         launch(args);
     }
 
-    public static void SpawnMacros() throws FileNotFoundException {
+    public static void SpawnMacros(Boolean siteBool) throws FileNotFoundException {
         Main.spawns[0] = new MacroObjSpawn("ct");
         Main.spawns[1] = new MacroObjSpawn("t");
 
-        Main.sites[0] = new MacroObjSite("a");
-        Main.sites[1] = new MacroObjSite("b");
+        if(siteBool){
+            Main.sites[0] = new MacroObjSite("a");
+            Main.sites[1] = new MacroObjSite("b");
 
-        for (MacroObjSpawn spawn : spawns){
-            group.getChildren().add(spawn.spawnGroup);
+            for (MacroObjSpawn spawn : spawns){
+                group.getChildren().add(spawn.spawnGroup);
+            }
+
+            for (MacroObjSite site : sites){
+                group.getChildren().add(site.siteGroup);
+            }
+        }else{
+
+            for (MacroObjSpawn spawn : spawns){
+                group.getChildren().add(spawn.spawnGroup);
+            }
+
+            for (MacroObjSite site : Main.sites){
+                group.getChildren().add(site.siteGroup);
+            }
         }
 
-        for (MacroObjSite site : sites){
-            group.getChildren().add(site.siteGroup);
-        }
+
     }
 
     static void MoveMicro(){
@@ -450,15 +796,19 @@ public class Main extends Application {
         }
     }
 
-    public static void serealize(){
+    public static void serealize() throws FileNotFoundException {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Open Resource File");
         File file = fileChooser.showOpenDialog(Main.primaryStage);
 
+        PrintWriter writer = new PrintWriter(file);
+        writer.print("");
+        writer.close();
+
         Serealization.serializeNow(file);
     }
 
-    public static void deserealize(){
+    public static void deserealize() throws IOException, ClassNotFoundException {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Open Resource File");
         File file = fileChooser.showOpenDialog(Main.primaryStage);
@@ -523,6 +873,8 @@ public class Main extends Application {
 
             dialog.getDialogPane().getChildren().add(endGrid);
             endOfTheGame = true;
+            minimap.updateMap();
+            Main.updateGlobalLabels();
             dialog.show();
         }
     }
@@ -542,7 +894,6 @@ public class Main extends Application {
                     if(site.timeStartedCT == 0){
                         site.timeStartedCT = new Date().getTime();
                     }
-
                     site.getMacro("ct");
                 }
             }else if(site.getBelong().equals("none")){

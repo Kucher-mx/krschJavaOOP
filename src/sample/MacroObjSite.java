@@ -55,7 +55,6 @@ public class MacroObjSite implements Serializable {
     }
 
     public String fightToGet(){
-        System.out.println("fight");
         String winner = "";
         Iterator tIterator = t.iterator();
         Iterator ctIterator = ct.iterator();
@@ -64,7 +63,6 @@ public class MacroObjSite implements Serializable {
         while (tIterator.hasNext() && ctIterator.hasNext()) {
             MicroObject unitT = (MicroObject) tIterator.next();
             MicroObject unitCT = (MicroObject) ctIterator.next();
-            System.out.println(unitT + " fights with: " + unitCT);
             unitCT.interactInMacro(unitT);
 
             if(!unitT.getAlive()){
@@ -115,6 +113,7 @@ public class MacroObjSite implements Serializable {
                         unitCT.microWrapper.setTranslateY(unitCT.getY());
                         unitCT.setSpeed(unitCT.defaultSpeed);
                         unitCT.microWrapper.setStyle(" ");
+                        unitCT.microLabel.setText("Lvl: " + unitCT.getLvl() + ", hp: "  + unitCT.getHp());
                     }
                     if(unitCT.getActive()){
                         unitCT.changeActive();
@@ -131,10 +130,10 @@ public class MacroObjSite implements Serializable {
                 Main.getA = false;
                 Main.getB = false;
                 Main.minimap.updateSite(this, "ct");
+                Main.minimap.updateMap();
                 this.timeStartedCT = 0;
             }
         }else if(side.equals("t")){
-
             if(timeStartedT + Main.timeToCapture <= new Date().getTime()){
                 this.setBelong("t");
                 this.siteLabel.setText("Site" + this.getName() + ", belongs to: " + belongs);
@@ -159,6 +158,7 @@ public class MacroObjSite implements Serializable {
                         unitT.microWrapper.setTranslateY(unitT.getY());
                         unitT.setSpeed(unitT.defaultSpeed);
                         Main.minimap.addUnit(unitT);
+                        unitT.microLabel.setText("Lvl: " + unitT.getLvl() + ", hp: "  + unitT.getHp());
                     }
                     if(unitT.getActive()){
                         unitT.changeActive();
@@ -172,6 +172,7 @@ public class MacroObjSite implements Serializable {
                 Main.getA = false;
                 Main.getB = false;
                 Main.minimap.updateSite(this, "t");
+                Main.minimap.updateMap();
                 this.timeStartedT = 0;
             }
         }
@@ -245,20 +246,93 @@ public class MacroObjSite implements Serializable {
         this.siteGroup = new Group(siteWrapper);
     }
 
-    public void Save( FileWriter fileWriter ) throws IOException
-    {
-        fileWriter.write( this.getName() );
-        fileWriter.write("\n");
-        fileWriter.write( this.getBelong() );
-        fileWriter.write("\n");
-//        fileWriter.write( Double.toString(this.getTranslateX()) );
-//        fileWriter.write("\n");
-//        fileWriter.write( Double.toString(this.getTranslateY()) );
-//        fileWriter.write("\n");
-//        fileWriter.write( this.getSide() );
-//        fileWriter.write("\n");
-//        fileWriter.write( Integer.toString(this.count) );
-//        fileWriter.write("\n");
+    public MacroObjSite(String name, String belongsTo, long ctTime, long tTime) throws FileNotFoundException {
+        this.name = name;
+        this.belongs = belongsTo;
+
+        int x, y;
+        if(name.equals("a")){
+            x = 2820;
+            y = 410;
+            this.siteWrapper.getRowConstraints().add(new RowConstraints(30));
+            this.siteWrapper.getRowConstraints().add(new RowConstraints(200));
+
+            this.siteWrapper.getColumnConstraints().add(new ColumnConstraints(117));
+            this.siteWrapper.getColumnConstraints().add(new ColumnConstraints(117));
+
+
+            siteLabel.setTextFill(Color.WHITE);
+            siteLabel.setText("Site A, belongs to: " + belongs);
+            siteImage = new Image(new FileInputStream("src/source/a_site.png"));
+            siteImageView = new ImageView(siteImage);
+            siteWrapper.setTranslateX(x);
+            siteWrapper.setTranslateY(y);
+            siteImageView.setPreserveRatio(true);
+            siteImageView.setFitWidth(90);
+            siteImageView.setFitHeight(90);
+            siteWrapper.setHalignment(siteLabel, HPos.CENTER);
+            siteWrapper.setValignment(siteLabel, VPos.CENTER);
+            siteWrapper.setHalignment(imgWrap, HPos.CENTER);
+            siteWrapper.setValignment(imgWrap, VPos.CENTER);
+            siteWrapper.setGridLinesVisible(true);
+            siteWrapper.add(siteLabel, 0, 0, 2, 1);
+            siteWrapper.add(siteImageView, 0, 1);
+            siteWrapper.setStyle("-fx-background-color: gray");
+            siteWrapper.setOpacity(0.8);
+        }else{
+            x = 600;
+            y = 230;
+            this.siteWrapper.getRowConstraints().add(new RowConstraints(20));
+            this.siteWrapper.getRowConstraints().add(new RowConstraints(280));
+
+            this.siteWrapper.getColumnConstraints().add(new ColumnConstraints(160));
+            this.siteWrapper.getColumnConstraints().add(new ColumnConstraints(160));
+
+            siteLabel.setTextFill(Color.WHITE);
+            siteLabel.setText("Site B, belongs to: " + belongs);
+            siteImage = new Image(new FileInputStream("src/source/b_site.png"));
+            siteImageView = new ImageView(siteImage);
+            siteImageView.setPreserveRatio(true);
+            siteImageView.setFitWidth(90);
+            siteImageView.setFitHeight(90);
+            siteWrapper.setTranslateX(x);
+            siteWrapper.setTranslateY(y);
+            siteWrapper.setHalignment(siteLabel, HPos.CENTER);
+            siteWrapper.setValignment(siteLabel, VPos.CENTER);
+            siteWrapper.setHalignment(imgWrap, HPos.CENTER);
+            siteWrapper.setValignment(imgWrap, VPos.CENTER);
+            siteWrapper.setGridLinesVisible(true);
+            siteWrapper.add(siteLabel, 0, 0, 2, 1);
+            siteWrapper.add(siteImageView, 0, 1);
+            siteWrapper.setStyle("-fx-background-color: gray");
+            siteWrapper.setOpacity(0.8);
+        }
+
+        if(this.getBelong().equals("t")){
+            this.siteLabel.setText("Site" + this.getName() + ", belongs to: " + belongs);
+            siteWrapper.getChildren().remove(getImgView);
+            getImg = new Image(new FileInputStream("src/source/t_got_spot.png"));
+            getImgView = new ImageView(getImg);
+            getImgView.setPreserveRatio(true);
+            getImgView.setFitWidth(90);
+            getImgView.setFitHeight(90);
+            siteWrapper.add(getImgView, 1, 1);
+        }else if(this.getBelong().equals("ct")){
+            this.siteLabel.setText("Site" + this.getName() + ", belongs to: " + belongs);
+            siteWrapper.getChildren().remove(getImgView);
+            getImg = new Image(new FileInputStream("src/source/ct_got_spot.png"));
+            getImgView = new ImageView(getImg);
+            getImgView.setPreserveRatio(true);
+            getImgView.setFitWidth(90);
+            getImgView.setFitHeight(90);
+            siteWrapper.add(getImgView, 1, 1);
+        }
+
+        siteLabel.setStyle("-fx-border-style: solid outside;" +
+                "-fx-border-width: 2;" +
+                "-fx-border-radius: 5;" +
+                "-fx-border-color: blue;");
+        this.siteGroup = new Group(siteWrapper);
     }
 
     public void addCt(MicroObject obj) {

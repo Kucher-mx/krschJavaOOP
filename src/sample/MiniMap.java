@@ -4,18 +4,11 @@ import javafx.event.EventHandler;
 import javafx.geometry.HPos;
 import javafx.geometry.VPos;
 import javafx.scene.Group;
-import javafx.scene.Node;
-import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
-import javafx.scene.paint.ImagePattern;
-import javafx.scene.shape.Circle;
-import javafx.scene.shape.Rectangle;
-import javafx.scene.text.Font;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -23,9 +16,9 @@ import java.util.HashMap;
 
 public class MiniMap {
     final static private double SCALE = 0.1;
-    private final HashMap<MicroObject, ImageView> micros;
-    private final HashMap<MacroObjSite, Group> sites;
-    private final HashMap<MacroObjSpawn, Group> spawns;
+    public static HashMap<MicroObject, ImageView> micros;
+    public static HashMap<MacroObjSite, Group> sites;
+    public static HashMap<MacroObjSpawn, Group> spawns;
 
     public Group getPane() {
         return Main.miniMapGroup;
@@ -51,7 +44,6 @@ public class MiniMap {
         spawns = new HashMap<>();
 
         for (MicroObject unit : Main.microObjectsCT) {
-            System.out.println(unit);
             addUnit(unit);
         }
 
@@ -220,7 +212,7 @@ public class MiniMap {
     }
 
     public void updateSite(MacroObjSite site, String side) throws FileNotFoundException {
-        Image getImg;
+        Image getImg = null;
         ImageView getImgView = null;
         ImageView imageView = null;
         GridPane siteWrapper = new GridPane();
@@ -229,43 +221,32 @@ public class MiniMap {
 
         if(side.equals("t")){
             getImg = new Image(new FileInputStream("src/source/t_got_spot.png"));
-        }else{
+        }else if (side.equals("ct")){
             getImg = new Image(new FileInputStream("src/source/ct_got_spot.png"));
         }
 
         if(site.getName().equals("a")){
             imageView = new ImageView(new Image(new FileInputStream("src/source/a_site.png")));
-            imageView.setPreserveRatio(true);
-            imageView.setFitHeight(150 * MiniMap.SCALE);
-
-            getImgView = new ImageView(getImg);
-            getImgView.setPreserveRatio(true);
-            getImgView.setFitWidth(120 * SCALE);
-
-            siteWrapper.getRowConstraints().add(new RowConstraints(30 * MiniMap.SCALE));
-            siteWrapper.getRowConstraints().add(new RowConstraints(200 * MiniMap.SCALE));
-
-            siteWrapper.getColumnConstraints().add(new ColumnConstraints(117 * MiniMap.SCALE));
-            siteWrapper.getColumnConstraints().add(new ColumnConstraints(117 * MiniMap.SCALE));
+            siteWrapper.getRowConstraints().add(new RowConstraints(20 * MiniMap.SCALE));
+            siteWrapper.getRowConstraints().add(new RowConstraints(250 * MiniMap.SCALE));
+            siteWrapper.getColumnConstraints().add(new ColumnConstraints(140 * MiniMap.SCALE));
+            siteWrapper.getColumnConstraints().add(new ColumnConstraints(140 * MiniMap.SCALE));
             siteWrapper.setLayoutX(2820 * MiniMap.SCALE);
             siteWrapper.setLayoutY(410 * MiniMap.SCALE);
-        }else{
-            imageView = new ImageView(new Image(new FileInputStream("src/source/a_site.png")));
-            imageView.setPreserveRatio(true);
-            imageView.setFitHeight(150 * MiniMap.SCALE);
-
-            getImgView = new ImageView(getImg);
-            getImgView.setPreserveRatio(true);
-            getImgView.setFitWidth(120 * SCALE);
-
-            siteWrapper.getRowConstraints().add(new RowConstraints(30 * MiniMap.SCALE));
-            siteWrapper.getRowConstraints().add(new RowConstraints(200 * MiniMap.SCALE));
-
-            siteWrapper.getColumnConstraints().add(new ColumnConstraints(117 * MiniMap.SCALE));
-            siteWrapper.getColumnConstraints().add(new ColumnConstraints(117 * MiniMap.SCALE));
-            siteWrapper.setLayoutX(2820 * MiniMap.SCALE);
-            siteWrapper.setLayoutY(410 * MiniMap.SCALE);
+        }else if(site.getName().equals("b")){
+            imageView = new ImageView(new Image(new FileInputStream("src/source/b_site.png")));
+            siteWrapper.getRowConstraints().add(new RowConstraints(50 * MiniMap.SCALE));
+            siteWrapper.getRowConstraints().add(new RowConstraints(240 * MiniMap.SCALE));
+            siteWrapper.getColumnConstraints().add(new ColumnConstraints(160 * MiniMap.SCALE));
+            siteWrapper.getColumnConstraints().add(new ColumnConstraints(160 * MiniMap.SCALE));
+            siteWrapper.setLayoutX(600 * MiniMap.SCALE);
+            siteWrapper.setLayoutY(230 * MiniMap.SCALE);
         }
+        imageView.setPreserveRatio(true);
+        imageView.setFitHeight(150 * MiniMap.SCALE);
+        getImgView = new ImageView(getImg);
+        getImgView.setPreserveRatio(true);
+        getImgView.setFitWidth(120 * SCALE);
 
         siteWrapper.setHalignment(imgWrap, HPos.CENTER);
         siteWrapper.setValignment(imgWrap, VPos.CENTER);
@@ -274,11 +255,11 @@ public class MiniMap {
         siteWrapper.setStyle("-fx-background-color: gray");
         siteWrapper.setOpacity(0.8);
         siteWrapper.add(getImgView, 1, 1);
-
         group = new Group(siteWrapper);
-        sites.replace(site, sites.get(site), group);
+
         Main.miniMapGroup.getChildren().remove(sites.get(site));
-        Main.miniMapGroup.getChildren().addAll(group);
+        sites.put(site, group);
+        Main.miniMapGroup.getChildren().add(group);
     }
 
     public void updateMap() {

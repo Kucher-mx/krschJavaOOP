@@ -391,6 +391,8 @@ public class MicroObject implements Comparable<MicroObject>, Cloneable, Serializ
             double xDiff = this.destinationX - this.getX();
             double yDiff = this.destinationY - this.getY();
             //handling x difference
+            System.out.println("yDiff: " + Math.abs(yDiff / 10) + ", charSpeed: " + (this.characterSpeed / 10));
+            System.out.println("xDiff: " + Math.abs(xDiff / 10) + ", charSpeed: " + (this.characterSpeed / 10));
             if(xDiff < 0){
 
                 if(Math.abs(xDiff) <= this.characterSpeed){
@@ -406,7 +408,6 @@ public class MicroObject implements Comparable<MicroObject>, Cloneable, Serializ
                 }else{
                     this.setXCoord(this.getX() + (this.characterSpeed / 10));
                 }
-
             }
             //handling y difference
             if(yDiff < 0){

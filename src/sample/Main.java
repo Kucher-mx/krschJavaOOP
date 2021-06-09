@@ -154,6 +154,8 @@ public class Main extends Application {
             SpawnMicros(ctLvls, "ct");
         }
 
+        Main.endOfTheGame = false;
+
         scrollPane = new ScrollPane(group);
         minimap = new MiniMap();
 
@@ -179,7 +181,7 @@ public class Main extends Application {
         layout2.setAlignment(minimap.getPane(), Pos.TOP_RIGHT);
 
         Button save = new Button("Save");
-        Button edit = new Button("Edit");
+        Button secondBtn = new Button("Keys info");
 
         save.setOnAction(new EventHandler<ActionEvent>() {
             @Override
@@ -205,7 +207,76 @@ public class Main extends Application {
             }
         });
 
-        topMenu.getChildren().addAll(save, edit);
+        secondBtn.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent actionEvent) {
+                Dialog<Boolean> dialog = new Dialog<>();
+                dialog.setTitle("Key handling info");
+                Button button = new Button("OK");
+                Label V = new Label("V - use ability of 2&3 lvl units");
+                Label B = new Label("B - use berserk mode (All units)");
+                Label R = new Label("B - remove selected units");
+                Label C = new Label("C - sent all units to macro + enlarge speed");
+                Label ESCAPE = new Label("ESCAPE - cancel selection");
+                Label I = new Label("I - insert an unit");
+                Label WASD = new Label("WASD - move active unit/units");
+
+                GridPane dialogPane = new GridPane();
+
+                dialogPane.getRowConstraints().add(new RowConstraints(30));
+                dialogPane.getRowConstraints().add(new RowConstraints(30));
+                dialogPane.getRowConstraints().add(new RowConstraints(30));
+                dialogPane.getRowConstraints().add(new RowConstraints(30));
+                dialogPane.getRowConstraints().add(new RowConstraints(30));
+                dialogPane.getRowConstraints().add(new RowConstraints(30));
+                dialogPane.getRowConstraints().add(new RowConstraints(30));
+                dialogPane.getRowConstraints().add(new RowConstraints(30));
+
+                dialogPane.getColumnConstraints().add(new ColumnConstraints(250));
+
+                dialogPane.add(WASD, 0, 0);
+                dialogPane.add(ESCAPE, 0, 1);
+                dialogPane.add(R, 0, 2);
+                dialogPane.add(I, 0, 3);
+                dialogPane.add(C, 0, 4);
+                dialogPane.add(V, 0, 7);
+                dialogPane.add(B, 0, 8);
+                dialogPane.add(button, 0, 9);
+
+                dialogPane.setHalignment(WASD, HPos.CENTER);
+                dialogPane.setValignment(WASD, VPos.CENTER);
+                dialogPane.setHalignment(ESCAPE, HPos.CENTER);
+                dialogPane.setValignment(ESCAPE, VPos.CENTER);
+                dialogPane.setHalignment(R, HPos.CENTER);
+                dialogPane.setValignment(R, VPos.CENTER);
+                dialogPane.setHalignment(I, HPos.CENTER);
+                dialogPane.setValignment(I, VPos.CENTER);
+                dialogPane.setHalignment(C, HPos.CENTER);
+                dialogPane.setValignment(C, VPos.CENTER);
+                dialogPane.setHalignment(V, HPos.CENTER);
+                dialogPane.setValignment(V, VPos.CENTER);
+                dialogPane.setHalignment(B, HPos.CENTER);
+                dialogPane.setValignment(B, VPos.CENTER);
+                dialogPane.setHalignment(button, HPos.RIGHT);
+                dialogPane.setValignment(button, VPos.CENTER);
+
+                dialogPane.setStyle("-fx-padding: 15px 0 0 75px;");
+
+                dialog.getDialogPane().setPrefSize(400, 330);
+                dialog.getDialogPane().getChildren().add(dialogPane);
+
+                button.setOnAction(new EventHandler<ActionEvent>() {
+                    @Override
+                    public void handle(ActionEvent actionEvent) {
+                        dialog.setResult(Boolean.TRUE);
+                    }
+                });
+
+                dialog.showAndWait();
+            }
+        });
+
+        topMenu.getChildren().addAll(save, secondBtn);
 
         topMenuWrapper.getChildren().add(topMenu);
         topMenuWrapper.getChildren().add(microCt);
@@ -819,7 +890,8 @@ public class Main extends Application {
     public static void checkWin(){
         Dialog<Boolean> dialog = new Dialog<>();
         dialog.setTitle("Game Over");
-        Button restart = new Button("Quit");
+        Button restart = new Button("Restart");
+        Button quit = new Button("Quit");
         Label gameOverLabel = new Label();
         GridPane endGrid = new GridPane();
         Boolean won = false;
@@ -827,6 +899,7 @@ public class Main extends Application {
         endGrid.getRowConstraints().add(new RowConstraints(50));
         endGrid.getRowConstraints().add(new RowConstraints(50));
 
+        endGrid.getColumnConstraints().add(new ColumnConstraints(200));
         endGrid.getColumnConstraints().add(new ColumnConstraints(200));
 
 
@@ -852,22 +925,44 @@ public class Main extends Application {
 
         endGrid.setHalignment(gameOverLabel, HPos.CENTER);
         endGrid.setValignment(gameOverLabel, VPos.CENTER);
-        endGrid.setHalignment(restart, HPos.CENTER);
-        endGrid.setValignment(restart, VPos.CENTER);
+        endGrid.setHalignment(quit, HPos.CENTER);
+        endGrid.setValignment(quit, VPos.CENTER);
 
-        dialog.getDialogPane().setPrefSize(320, 150);
-        endGrid.setStyle("-fx-padding: 25px 0 0 60px;");
+        dialog.getDialogPane().setPrefSize(520, 200);
+        endGrid.setStyle("-fx-padding: 50px 0 0 60px;");
         endGrid.setGridLinesVisible(true);
 
         if(won){
-            endGrid.add(gameOverLabel, 0, 0);
+            endGrid.add(gameOverLabel, 0, 0, 2 , 1);
             endGrid.add(restart, 0, 1);
+            endGrid.add(quit, 0, 1);
+            won = false;
+
+            quit.setOnAction(new EventHandler<ActionEvent>() {
+                @Override
+                public void handle(ActionEvent actionEvent) {
+                    dialog.setResult(Boolean.TRUE);
+                    System.exit(0);
+                }
+            });
 
             restart.setOnAction(new EventHandler<ActionEvent>() {
                 @Override
                 public void handle(ActionEvent actionEvent) {
                     dialog.setResult(Boolean.TRUE);
-                    System.exit(0);
+                    Main.microObjectsCT = new ArrayList<MicroObject>();
+                    Main.microObjectsT = new ArrayList<MicroObject>();
+                    Main.sites = new MacroObjSite[2];
+                    Main.spawns = new MacroObjSpawn[2];
+
+                    Main.minimap.getPane().getChildren().clear();
+                    Main.group.getChildren().clear();
+                    Main.topMenu.getChildren().clear();
+                    Main.topMenuWrapper.getChildren().clear();
+                    Main.showInfoActiveGroup.getChildren().clear();
+                    Main.showInfoActiveWrapper.getChildren().clear();
+                    Main.timer.stop();
+                    Main.setSetupStage();
                 }
             });
 

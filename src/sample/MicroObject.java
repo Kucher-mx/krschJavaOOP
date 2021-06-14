@@ -16,7 +16,7 @@ import java.util.*;
 
 public class MicroObject implements Comparable<MicroObject>, Cloneable, Serializable {
     private String characterSite;
-    public int characterLevel;
+    private int characterLevel;
     private double characterSpeed;
     private int damage;
     private int characterKevlar;
@@ -40,6 +40,7 @@ public class MicroObject implements Comparable<MicroObject>, Cloneable, Serializ
     protected transient Group microGroup;
     protected transient Image microImage;
     protected transient ImageView microImageView;
+
     public transient static int idCounter = 0;
 
     public int getLvl(){
@@ -139,6 +140,10 @@ public class MicroObject implements Comparable<MicroObject>, Cloneable, Serializ
 
     public boolean getInMacro(){
         return this.inMacroSite;
+    }
+
+    public MicroObject() throws FileNotFoundException {
+        this(Main.getRandomBoolean() ? "ct" : "t");
     }
 
     public MicroObject(String side) throws FileNotFoundException {
@@ -322,8 +327,13 @@ public class MicroObject implements Comparable<MicroObject>, Cloneable, Serializ
     }
 
     public void run(double x, double y){
-        this.setXCoord(this.getX() + this.getSpeed() * x);
-        this.setYCoord(this.getY() + this.getSpeed() * y);
+        if(!((this.getX() + this.getSpeed() * x) <= -10) && !((this.getX() + this.getSpeed() * x) > 3600)){
+            this.setXCoord(this.getX() + this.getSpeed() * x);
+        }
+
+        if(!((this.getY() + this.getSpeed() * y) <= 0) && !((this.getY() + this.getSpeed() * y) > 2865)){
+            this.setYCoord(this.getY() + this.getSpeed() * y);
+        }
 
         this.microWrapper.setTranslateX(this.getX());
         this.microWrapper.setTranslateY(this.getY());
@@ -391,8 +401,6 @@ public class MicroObject implements Comparable<MicroObject>, Cloneable, Serializ
             double xDiff = this.destinationX - this.getX();
             double yDiff = this.destinationY - this.getY();
             //handling x difference
-            System.out.println("yDiff: " + Math.abs(yDiff / 10) + ", charSpeed: " + (this.characterSpeed / 10));
-            System.out.println("xDiff: " + Math.abs(xDiff / 10) + ", charSpeed: " + (this.characterSpeed / 10));
             if(xDiff < 0){
 
                 if(Math.abs(xDiff) <= this.characterSpeed){
@@ -443,29 +451,6 @@ public class MicroObject implements Comparable<MicroObject>, Cloneable, Serializ
         System.out.println("Follow this advice: " + msg);
     }
 
-    //serialize to txt
-    public void Save( FileWriter fileWriter ) throws IOException{
-        fileWriter.write( Integer.toString(this.getLvl()));
-        fileWriter.write("\n");
-
-        fileWriter.write( Integer.toString(this.id));
-        fileWriter.write("\n");
-
-        fileWriter.write( Double.toString(this.getX()));
-        fileWriter.write("\n");
-
-        fileWriter.write( Double.toString(this.getY()));
-        fileWriter.write("\n");
-
-        fileWriter.write( Double.toString(this.getXDest()));
-        fileWriter.write("\n");
-
-        fileWriter.write( Double.toString(this.getYDest()));
-        fileWriter.write("\n");
-
-        fileWriter.write(this.getSide());
-        fileWriter.write("\n");
-    }
 
     @Override
     public boolean equals(Object obj) {
@@ -502,7 +487,6 @@ public class MicroObject implements Comparable<MicroObject>, Cloneable, Serializ
             return 0;
         }
 
-
     };
 
     @Override
@@ -516,12 +500,9 @@ public class MicroObject implements Comparable<MicroObject>, Cloneable, Serializ
         return tmp;
     }
 
-    public void callBaseMethodWithMsg(){
-        System.out.println("not this one");
-    }
 
-    public void callBaseMethod(){
-        System.out.println("not this one");
-    }
-
+//    @Override
+//    public Object clone() throws CloneNotSupportedException{
+//        return super.clone();
+//    }
 }

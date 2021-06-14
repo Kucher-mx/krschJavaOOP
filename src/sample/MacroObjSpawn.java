@@ -12,7 +12,7 @@ import javafx.scene.paint.Color;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.util.Iterator;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.Queue;
 
@@ -21,11 +21,11 @@ public class MacroObjSpawn {
     Queue ct = new LinkedList();
     Queue t = new LinkedList();
 
-    protected Group spawnGroup;
-    protected GridPane spawnWrapper = new GridPane();
-    protected Label spawnLabel = new Label();
-    protected Image spawnImage;
-    protected ImageView spawnImageView;
+    Group spawnGroup;
+    GridPane spawnWrapper = new GridPane();
+    Label spawnLabel = new Label();
+    Image spawnImage;
+    ImageView spawnImageView;
 
     public String getName(){
         return this.name;
@@ -100,29 +100,26 @@ public class MacroObjSpawn {
     }
 
     public void printTeamT(){
-        Iterator iterator = this.t.iterator();
-        if(t.peek() == null){
+        Object [] tArray = this.t.toArray();
+
+        if(tArray.length == 0){
             System.out.println("It's nobody there");
-        }else{
-            System.out.println("T side members: ");
+            return;
         }
 
-        while (iterator.hasNext()) {
-            System.out.print(iterator.next() + "\n");
-        }
+        Arrays.toString(tArray);
+
     }
 
     public void printTeamCT(){
-        Iterator iterator = this.ct.iterator();
-        if(ct.peek() == null){
+        Object [] ctArray = this.ct.toArray();
+
+        if(ctArray.length == 0){
             System.out.println("It's nobody there");
-        }else{
-            System.out.println("CT side members: ");
+            return;
         }
 
-        while (iterator.hasNext()) {
-            System.out.print(iterator.next() + "\n");
-        }
+        Arrays.toString(ctArray);
     }
 }
 

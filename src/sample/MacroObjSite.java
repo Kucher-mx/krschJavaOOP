@@ -12,6 +12,8 @@ import javafx.scene.paint.Color;
 import java.io.*;
 import java.util.*;
 
+import static java.util.Arrays.sort;
+
 public class MacroObjSite implements Serializable {
     public long timeStartedCT;
     public long timeStartedT;
@@ -20,14 +22,14 @@ public class MacroObjSite implements Serializable {
     Queue<MicroObject> ct = new LinkedList<>();
     Queue<MicroObject> t = new LinkedList<>();
 
-    protected transient GridPane siteWrapper = new GridPane();
-    public transient VBox imgWrap = new VBox();
-    protected transient Image getImg;
-    public transient ImageView getImgView;
-    protected transient Label siteLabel = new Label();
-    protected transient Group siteGroup;
-    protected transient Image siteImage;
-    public transient ImageView siteImageView;
+    transient GridPane siteWrapper = new GridPane();
+    transient VBox imgWrap = new VBox();
+    transient Image getImg;
+    transient ImageView getImgView;
+    transient Label siteLabel = new Label();
+    transient Group siteGroup;
+    transient Image siteImage;
+    transient ImageView siteImageView;
 
     public String getName(){
         return this.name;
@@ -351,31 +353,64 @@ public class MacroObjSite implements Serializable {
         t.remove(obj);
     }
 
+
+    public static void sortArr(MicroObject[] arr){
+        sort(arr, MicroObject.lvlComparator);
+    }
+
     public void printTeamT(){
+        Object [] tArray = this.t.toArray();
 
-        Iterator iterator = this.t.iterator();
-        if(t.peek() == null){
+        if(tArray.length == 0){
+            System.out.println("It's nobody there");
+            return;
+        }
+
+        sortArr((MicroObject[]) tArray);
+
+        for(Object t : tArray){
+            if(t instanceof MicroObject){
+                System.out.println(t);
+            }
+        }
+//        Iterator iterator = this.t.iterator();
+//        if(t.peek() == null){
 //            System.out.println("It's nobody there");
-        }else{
-            System.out.println("T side members: ");
-        }
-
-        while (iterator.hasNext()) {
-            System.out.print(iterator.next() + "\n");
-        }
+//        }else{
+//            System.out.println("T side members: ");
+//        }
+//
+//        while (iterator.hasNext()) {
+//            System.out.print(iterator.next() + "\n");
+//        }
     }
 
     public void printTeamCT(){
-        Iterator iterator = this.ct.iterator();
-        if(ct.peek() == null){
-//            System.out.println("It's nobody there");
-        }else{
-            System.out.println("CT side members: ");
+        Object [] ctArray = this.ct.toArray();
+
+        if(ctArray.length == 0){
+            System.out.println("It's nobody there");
+            return;
         }
 
-        while (iterator.hasNext()) {
-            System.out.print(iterator.next() + "\n");
+        sortArr((MicroObject[]) ctArray);
+
+        for(Object ct : ctArray){
+            if(ct instanceof MicroObject){
+                System.out.println(ct);
+            }
         }
+
+//        Iterator iterator = this.ct.iterator();
+//        if(ct.peek() == null){
+//            System.out.println("It's nobody there");
+//        }else{
+//            System.out.println("CT side members: ");
+//        }
+//
+//        while (iterator.hasNext()) {
+//            System.out.print(iterator.next() + "\n");
+//        }
     }
 }
 

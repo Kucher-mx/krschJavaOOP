@@ -178,7 +178,7 @@ public class MicroObjectOne extends MicroObject{
                 "id: " + id +
                 "site: " + super.getSide() +
                 ", hp: " + super.getHp() +
-                ", lvl: " + characterLevel +
+                ", lvl: " + super.getLvl() +
                 ", kevlar" + super.getKevlar() +
                 ", damage" + super.getDamageProp() +
                 ", x: " + super.getX() +

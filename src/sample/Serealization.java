@@ -1,7 +1,5 @@
 package sample;
 
-import javafx.scene.control.Alert;
-import javafx.scene.control.Label;
 import java.awt.*;
 import java.io.*;
 import java.util.ArrayList;

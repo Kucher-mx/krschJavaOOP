@@ -29,6 +29,14 @@ import javafx.scene.shape.Rectangle;
 
 public class Main extends Application {
 
+    static {
+        System.out.println("static block init");
+    }
+
+    {
+        System.out.println("non-static block init");
+    }
+
     public static MacroObjSite[] sites = new MacroObjSite[2];
     public static MacroObjSpawn[] spawns = new MacroObjSpawn[2];
     public static ArrayList<MicroObject> microObjectsT = new ArrayList<MicroObject>();
@@ -51,10 +59,10 @@ public class Main extends Application {
     static Group group = new Group();
     static Scene scene;
     static StackPane layout2;
-    public static Wallpaper wallpaper;
-    public static DialogWindow dialogWindow;
-    public static ScrollPane scrollPane;
-    public static Stage primaryStage;
+    static Wallpaper wallpaper;
+    static DialogWindow dialogWindow;
+    static ScrollPane scrollPane;
+    static Stage primaryStage;
     final static Random random = new Random();
     static ImageView miniMapView;
     static Group miniMapGroup = new Group();
@@ -69,7 +77,6 @@ public class Main extends Application {
     static Label macroBInfo = new Label();
 
     static MiniMap minimap;
-
     static Group showInfoActiveGroup = new Group();
     static VBox showInfoActiveWrapper = new VBox();
 
@@ -154,6 +161,8 @@ public class Main extends Application {
             SpawnMicros(ctLvls, "ct");
         }
 
+//        SpawnMacrosTest(Main.sites[0]);
+//        SpawnMacrosTest(Main.spawns[1]);
         Main.endOfTheGame = false;
 
         scrollPane = new ScrollPane(group);
@@ -584,7 +593,6 @@ public class Main extends Application {
                     }
 
 
-
                     try {
                         if(sites[1].ct.size() > 0){
                             checkGetMacro(sites[1], "ct");
@@ -687,8 +695,6 @@ public class Main extends Application {
         }
     }
 
-
-
     @Override
     public void start(Stage primaryStage) throws Exception{
         System.setProperty("quantum.multithreaded", "true");
@@ -705,6 +711,16 @@ public class Main extends Application {
     public static void main(String[] args) {
         launch(args);
     }
+
+//    public static void SpawnMacrosTest(Object obj) throws FileNotFoundException {
+//        if(obj instanceof MacroObjSite){
+//            System.out.println("site: " + ((MacroObjSite) obj).getName());
+//        }
+//
+//        if(obj instanceof MacroObjSpawn){
+//            System.out.println("spawn: " + ((MacroObjSpawn) obj).getName());
+//        }
+//    }
 
     public static void SpawnMacros(Boolean siteBool) throws FileNotFoundException {
         Main.spawns[0] = new MacroObjSpawn("ct");
@@ -1022,5 +1038,9 @@ public class Main extends Application {
                 site.getMacro("t");
             }
         }
+    }
+
+    public static boolean getRandomBoolean() {
+        return Math.random() < 0.5;
     }
 }

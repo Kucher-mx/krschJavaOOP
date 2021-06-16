@@ -34,6 +34,8 @@ public class MicroObject implements Comparable<MicroObject>, Cloneable, Serializ
     public double defaultSpeed;
     public int defaultDamage;
 
+    transient private ArrayList<String> hpLog = new ArrayList<String>();
+
     protected transient GridPane microWrapper = new GridPane();
     protected transient Rectangle healthBar = new Rectangle();
     protected transient Label microLabel;
@@ -42,6 +44,7 @@ public class MicroObject implements Comparable<MicroObject>, Cloneable, Serializ
     protected transient ImageView microImageView;
 
     public transient static int idCounter = 0;
+    private static final long serialVersionUID = 1L;
 
     public int getLvl(){
         return this.characterLevel;
@@ -365,6 +368,9 @@ public class MicroObject implements Comparable<MicroObject>, Cloneable, Serializ
     }
 
     public void getDamage(MicroObject enemy){
+        Date hitDate = new Date(System.currentTimeMillis());
+        this.hpLog.add(Main.formatter.format(hitDate));
+
         switch (this.characterLevel){
             case 1:
                 this.characterHp -= enemy.getDamageProp();
@@ -381,6 +387,7 @@ public class MicroObject implements Comparable<MicroObject>, Cloneable, Serializ
                 this.characterKevlar -= 7;
                 break;
         }
+
     }
 
     public void run(boolean toMacro){
@@ -391,11 +398,11 @@ public class MicroObject implements Comparable<MicroObject>, Cloneable, Serializ
 
         if(Math.round(this.getX()) == Math.round(this.destinationX) && !toMacro){
 
-            this.destinationX = (double)Main.random.nextInt(3650);
+            this.destinationX = (double)Main.random.nextInt(3600);
 
         }else if(Math.round(this.getY()) == Math.round(this.destinationY) && !toMacro){
 
-            this.destinationY = (double)Main.random.nextInt(2850);
+            this.destinationY = (double)Main.random.nextInt(2865);
 
         }else{
             double xDiff = this.destinationX - this.getX();
@@ -443,15 +450,6 @@ public class MicroObject implements Comparable<MicroObject>, Cloneable, Serializ
         }
     }
 
-    public void sayToChild(){
-        System.out.println("Hello child :)");
-    }
-
-    public void sayToChild(String msg){
-        System.out.println("Follow this advice: " + msg);
-    }
-
-
     @Override
     public boolean equals(Object obj) {
         MicroObject character = (MicroObject) obj;
@@ -486,23 +484,27 @@ public class MicroObject implements Comparable<MicroObject>, Cloneable, Serializ
             if (obj1.characterLevel > obj2.characterLevel) return 1;
             return 0;
         }
-
     };
 
     @Override
     public Object clone() throws CloneNotSupportedException {
-        MicroObject tmp = null;
+        MicroObject copy = (MicroObject) super.clone();
         try {
-            tmp = new MicroObject(this.characterSite);
+            switch (this.getLvl()){
+                case 1:
+                    copy = new MicroObject(this.getSide(), this.getXDest(), this.getYDest(), this.getX(), this.getY(), this.getHp());
+                    break;
+                case 2:
+                    copy = new MicroObjectOne(this.getSide(), this.getXDest(), this.getYDest(), this.getX(), this.getY(), this.getHp());
+                    break;
+                case 3:
+                    copy = new MicroObjectTwo(this.getSide(), this.getXDest(), this.getYDest(), this.getX(), this.getY(), this.getHp());
+                    break;
+            }
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
-        return tmp;
+        return copy;
     }
 
-
-//    @Override
-//    public Object clone() throws CloneNotSupportedException{
-//        return super.clone();
-//    }
 }

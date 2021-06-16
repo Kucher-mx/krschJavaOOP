@@ -353,64 +353,57 @@ public class MacroObjSite implements Serializable {
         t.remove(obj);
     }
 
-
-    public static void sortArr(MicroObject[] arr){
-        sort(arr, MicroObject.lvlComparator);
-    }
-
     public void printTeamT(){
-        Object [] tArray = this.t.toArray();
+        System.out.println("Team t:");
+
+        int queueSize = this.t.size();
+        int i = 0;
+        MicroObject tArray[] = new MicroObject[queueSize];
+
+        Iterator iterator = this.t.iterator();
+
+        while (iterator.hasNext()) {
+            tArray[i] = (MicroObject) iterator.next();
+            System.out.println(tArray[i]);
+            i++;
+        }
 
         if(tArray.length == 0){
             System.out.println("It's nobody there");
             return;
         }
 
-        sortArr((MicroObject[]) tArray);
+        sort(tArray, MicroObject.lvlComparator);
 
-        for(Object t : tArray){
-            if(t instanceof MicroObject){
-                System.out.println(t);
-            }
-        }
-//        Iterator iterator = this.t.iterator();
-//        if(t.peek() == null){
-//            System.out.println("It's nobody there");
-//        }else{
-//            System.out.println("T side members: ");
-//        }
-//
-//        while (iterator.hasNext()) {
-//            System.out.print(iterator.next() + "\n");
-//        }
+        Arrays.toString(tArray);
     }
 
     public void printTeamCT(){
-        Object [] ctArray = this.ct.toArray();
+        System.out.println("Team ct:");
+
+        int queueSize = this.ct.size();
+        int i = 0;
+        MicroObject ctArray[] = new MicroObject[queueSize];
+
+        Iterator iterator = this.ct.iterator();
+
+        while (iterator.hasNext()) {
+            ctArray[i] = (MicroObject) iterator.next();
+            i++;
+        }
 
         if(ctArray.length == 0){
             System.out.println("It's nobody there");
             return;
         }
 
-        sortArr((MicroObject[]) ctArray);
+        sort(ctArray, MicroObject.lvlComparator);
 
         for(Object ct : ctArray){
             if(ct instanceof MicroObject){
                 System.out.println(ct);
             }
         }
-
-//        Iterator iterator = this.ct.iterator();
-//        if(ct.peek() == null){
-//            System.out.println("It's nobody there");
-//        }else{
-//            System.out.println("CT side members: ");
-//        }
-//
-//        while (iterator.hasNext()) {
-//            System.out.print(iterator.next() + "\n");
-//        }
     }
 }
 

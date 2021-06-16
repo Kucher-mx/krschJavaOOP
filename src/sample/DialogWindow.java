@@ -164,7 +164,6 @@ public class DialogWindow {
         });
 
         pane.setPadding(new Insets(1280/6, 720/2, 1280/4, 720/2));
-//        subPane.getChildren().addAll(labelWindow, textField, button);
         pane.add(labelWindow, 0, 0);
         pane.add(textField, 1, 0);
         pane.add(button, 2, 0);

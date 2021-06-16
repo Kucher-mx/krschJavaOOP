@@ -162,16 +162,6 @@ public class MicroObjectOne extends MicroObject{
 //        this.microGroup = new Group(this.microImageView, this.microLabel);
     }
 
-    public void callBaseMethod(){
-        super.sayToChild();
-    }
-
-    public void callBaseMethodWithMsg(){
-        System.out.println("Enter your message");
-        String msg = in.nextLine();
-        super.sayToChild(msg);
-    }
-
     @Override
     public String toString() {
         return "Unit#2: { " +

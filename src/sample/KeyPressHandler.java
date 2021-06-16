@@ -204,9 +204,8 @@ public class KeyPressHandler implements EventHandler<KeyEvent>{
 
         if (event.getCode().equals(KeyCode.C)){
             for(MicroObject unit : Main.microObjectsCT){
-                    unit.setSpeed(unit.getSpeed() * 2);
-                    int rndSite = Main.random.nextInt(1);
-                    if(rndSite == 0){
+                    int rndSite = Main.random.nextInt(100);
+                    if(rndSite % 2 == 0){
                         unit.setXCoordDest(Main.random.nextInt(50) + 2820);
                         unit.setYCoordDest(Main.random.nextInt(30) + 420);
                     }else{
@@ -218,9 +217,8 @@ public class KeyPressHandler implements EventHandler<KeyEvent>{
             }
 
             for(MicroObject unit : Main.microObjectsT){
-                    int rndSite = Main.random.nextInt(1);
-                    unit.setSpeed(unit.getSpeed() * 1.5);
-                    if(rndSite == 0){
+                    int rndSite = Main.random.nextInt(100);
+                    if(rndSite % 2 == 0){
                         unit.setXCoordDest(Main.random.nextInt(50) + 2820);
                         unit.setYCoordDest(Main.random.nextInt(30) + 420);
                     }else{
@@ -251,14 +249,18 @@ public class KeyPressHandler implements EventHandler<KeyEvent>{
             Button button = new Button("OK");
             Label V = new Label("V - use ability of 2&3 lvl units");
             Label B = new Label("B - use berserk mode (All units)");
-            Label R = new Label("B - remove selected units");
-            Label C = new Label("C - sent all units to macro + enlarge speed");
+            Label R = new Label("R - remove selected units");
+            Label C = new Label("C - sent all units to macro");
             Label ESCAPE = new Label("ESCAPE - cancel selection");
             Label I = new Label("I - insert an unit");
+            Label N = new Label("N - clone selected unit/units");
+            Label M = new Label("M - print units in sites, if they are (utils))");
             Label WASD = new Label("WASD - move active unit/units");
 
             GridPane dialogPane = new GridPane();
 
+            dialogPane.getRowConstraints().add(new RowConstraints(30));
+            dialogPane.getRowConstraints().add(new RowConstraints(30));
             dialogPane.getRowConstraints().add(new RowConstraints(30));
             dialogPane.getRowConstraints().add(new RowConstraints(30));
             dialogPane.getRowConstraints().add(new RowConstraints(30));
@@ -275,9 +277,11 @@ public class KeyPressHandler implements EventHandler<KeyEvent>{
             dialogPane.add(R, 0, 2);
             dialogPane.add(I, 0, 3);
             dialogPane.add(C, 0, 4);
-            dialogPane.add(V, 0, 7);
-            dialogPane.add(B, 0, 8);
-            dialogPane.add(button, 0, 9);
+            dialogPane.add(V, 0, 5);
+            dialogPane.add(B, 0, 6);
+            dialogPane.add(N, 0, 7);
+            dialogPane.add(M, 0, 8);
+            dialogPane.add(button, 0, 8);
 
             dialogPane.setHalignment(WASD, HPos.CENTER);
             dialogPane.setValignment(WASD, VPos.CENTER);
@@ -293,12 +297,16 @@ public class KeyPressHandler implements EventHandler<KeyEvent>{
             dialogPane.setValignment(V, VPos.CENTER);
             dialogPane.setHalignment(B, HPos.CENTER);
             dialogPane.setValignment(B, VPos.CENTER);
+            dialogPane.setHalignment(N, HPos.CENTER);
+            dialogPane.setValignment(N, VPos.CENTER);
+            dialogPane.setHalignment(M, HPos.CENTER);
+            dialogPane.setValignment(M, VPos.CENTER);
             dialogPane.setHalignment(button, HPos.RIGHT);
             dialogPane.setValignment(button, VPos.CENTER);
 
             dialogPane.setStyle("-fx-padding: 15px 0 0 75px;");
 
-            dialog.getDialogPane().setPrefSize(400, 330);
+            dialog.getDialogPane().setPrefSize(430, 330);
             dialog.getDialogPane().getChildren().add(dialogPane);
 
             button.setOnAction(new EventHandler<ActionEvent>() {
@@ -309,6 +317,59 @@ public class KeyPressHandler implements EventHandler<KeyEvent>{
             });
 
             dialog.showAndWait();
+        }
+
+        if (event.getCode().equals(KeyCode.N)){
+            ArrayList<MicroObject> clones = new ArrayList<MicroObject>();
+            MicroObject tmp;
+
+            for(MicroObject unit : Main.microObjectsCT) {
+                if (unit.getActive()) {
+                    try {
+                        tmp  = (MicroObject) unit.clone();
+                        clones.add(tmp);
+                    } catch (CloneNotSupportedException exception) {
+                        System.out.println("clone exception: " + exception);
+                    }
+                }
+            }
+
+            for(MicroObject unit : Main.microObjectsT) {
+                if (unit.getActive()) {
+                    try {
+                        tmp  = (MicroObject) unit.clone();
+                        clones.add(tmp);
+                    } catch (CloneNotSupportedException exception) {
+                        System.out.println("clone exception: " + exception);
+                    }
+                }
+            }
+
+            if (!clones.isEmpty()){
+                for (MicroObject unit : clones) {
+                    if (unit.getSide().equals("ct"))
+                        Main.microObjectsCT.add(unit);
+                    if (unit.getSide().equals("t"))
+                        Main.microObjectsT.add(unit);
+                    try {
+                        Main.minimap.addUnit(unit);
+                    } catch (FileNotFoundException fileNotFoundException) {
+                        fileNotFoundException.printStackTrace();
+                    }
+                    Main.group.getChildren().add(unit.microGroup);
+                }
+            }
+
+
+        }
+
+        if (event.getCode().equals(KeyCode.M)){
+            for (MacroObjSite site : Main.sites){
+                System.out.println("print site: " + site.getName());
+                site.printTeamCT();
+                site.printTeamT();
+                System.out.println();
+            }
         }
 
         if (event.getCode().equals(KeyCode.V)){

@@ -24,6 +24,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import javafx.scene.shape.Rectangle;
 
@@ -53,6 +54,8 @@ public class Main extends Application {
     public static boolean endOfTheGame = false;
     public static boolean getA = false;
     public static boolean getB = false;
+
+    static SimpleDateFormat formatter= new SimpleDateFormat("yyyy-MM-dd 'at' HH:mm:ss z");
 
     static AnimationTimer timer;
 
@@ -161,8 +164,6 @@ public class Main extends Application {
             SpawnMicros(ctLvls, "ct");
         }
 
-//        SpawnMacrosTest(Main.sites[0]);
-//        SpawnMacrosTest(Main.spawns[1]);
         Main.endOfTheGame = false;
 
         scrollPane = new ScrollPane(group);
@@ -224,14 +225,18 @@ public class Main extends Application {
                 Button button = new Button("OK");
                 Label V = new Label("V - use ability of 2&3 lvl units");
                 Label B = new Label("B - use berserk mode (All units)");
-                Label R = new Label("B - remove selected units");
+                Label R = new Label("R - remove selected units");
                 Label C = new Label("C - sent all units to macro + enlarge speed");
                 Label ESCAPE = new Label("ESCAPE - cancel selection");
                 Label I = new Label("I - insert an unit");
+                Label N = new Label("N - clone selected unit/units");
+                Label M = new Label("M - print units in sites, if they are (utils))");
                 Label WASD = new Label("WASD - move active unit/units");
 
                 GridPane dialogPane = new GridPane();
 
+                dialogPane.getRowConstraints().add(new RowConstraints(30));
+                dialogPane.getRowConstraints().add(new RowConstraints(30));
                 dialogPane.getRowConstraints().add(new RowConstraints(30));
                 dialogPane.getRowConstraints().add(new RowConstraints(30));
                 dialogPane.getRowConstraints().add(new RowConstraints(30));
@@ -248,9 +253,11 @@ public class Main extends Application {
                 dialogPane.add(R, 0, 2);
                 dialogPane.add(I, 0, 3);
                 dialogPane.add(C, 0, 4);
-                dialogPane.add(V, 0, 7);
-                dialogPane.add(B, 0, 8);
-                dialogPane.add(button, 0, 9);
+                dialogPane.add(V, 0, 5);
+                dialogPane.add(B, 0, 6);
+                dialogPane.add(N, 0, 7);
+                dialogPane.add(M, 0, 8);
+                dialogPane.add(button, 0, 8);
 
                 dialogPane.setHalignment(WASD, HPos.CENTER);
                 dialogPane.setValignment(WASD, VPos.CENTER);
@@ -266,12 +273,16 @@ public class Main extends Application {
                 dialogPane.setValignment(V, VPos.CENTER);
                 dialogPane.setHalignment(B, HPos.CENTER);
                 dialogPane.setValignment(B, VPos.CENTER);
+                dialogPane.setHalignment(N, HPos.CENTER);
+                dialogPane.setValignment(N, VPos.CENTER);
+                dialogPane.setHalignment(M, HPos.CENTER);
+                dialogPane.setValignment(M, VPos.CENTER);
                 dialogPane.setHalignment(button, HPos.RIGHT);
                 dialogPane.setValignment(button, VPos.CENTER);
 
                 dialogPane.setStyle("-fx-padding: 15px 0 0 75px;");
 
-                dialog.getDialogPane().setPrefSize(400, 330);
+                dialog.getDialogPane().setPrefSize(430, 330);
                 dialog.getDialogPane().getChildren().add(dialogPane);
 
                 button.setOnAction(new EventHandler<ActionEvent>() {
@@ -376,7 +387,7 @@ public class Main extends Application {
                         e.printStackTrace();
                     }
 
-                    if(berserkTimeEnd + 30000 <= new Date().getTime()){
+                    if(berserkTimeEnd + 20000 <= new Date().getTime()){
                         if(berserkPressed){
                             berserkHandle();
                         }else {
@@ -390,6 +401,17 @@ public class Main extends Application {
                                 micro.setDamage(micro.defaultDamage);
                                 micro.microLabel.setTextFill(Color.WHITE);
                             }
+                        }
+                    }else {
+                        interval = 250;
+                        for(MicroObject micro : microObjectsCT){
+                            micro.setDamage(micro.defaultDamage);
+                            micro.microLabel.setTextFill(Color.WHITE);
+                        }
+
+                        for(MicroObject micro : microObjectsT){
+                            micro.setDamage(micro.defaultDamage);
+                            micro.microLabel.setTextFill(Color.WHITE);
                         }
                     }
 
@@ -574,6 +596,17 @@ public class Main extends Application {
                                 micro.microLabel.setTextFill(Color.WHITE);
                             }
                         }
+                    }else{
+                        interval = 250;
+                        for(MicroObject micro : microObjectsCT){
+                            micro.setDamage(micro.defaultDamage);
+                            micro.microLabel.setTextFill(Color.WHITE);
+                        }
+
+                        for(MicroObject micro : microObjectsT){
+                            micro.setDamage(micro.defaultDamage);
+                            micro.microLabel.setTextFill(Color.WHITE);
+                        }
                     }
 
                     if(secondLvlAbilityTimeEnd + 30000 <= new Date().getTime()){
@@ -677,6 +710,8 @@ public class Main extends Application {
         if(berserkTimeStart == 0) {
             berserkTimeStart = new Date().getTime();
         }
+        System.out.println(berserkTimeStart + 15000 + " to " + new Date().getTime());
+        System.out.println("pressed: " + berserkPressed);
         if(berserkTimeStart + 15000 >= new Date().getTime()){
             interval = 100;
             for(MicroObject micro : microObjectsCT){
@@ -711,16 +746,6 @@ public class Main extends Application {
     public static void main(String[] args) {
         launch(args);
     }
-
-//    public static void SpawnMacrosTest(Object obj) throws FileNotFoundException {
-//        if(obj instanceof MacroObjSite){
-//            System.out.println("site: " + ((MacroObjSite) obj).getName());
-//        }
-//
-//        if(obj instanceof MacroObjSpawn){
-//            System.out.println("spawn: " + ((MacroObjSpawn) obj).getName());
-//        }
-//    }
 
     public static void SpawnMacros(Boolean siteBool) throws FileNotFoundException {
         Main.spawns[0] = new MacroObjSpawn("ct");

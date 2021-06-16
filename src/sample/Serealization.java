@@ -18,7 +18,6 @@ public class Serealization {
 
     public static void deserializeNow(File file) throws IOException, ClassNotFoundException {
         try(ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file))){
-//            ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file));
             ArrayList<MicroObject> ct = (ArrayList<MicroObject>) ois.readObject();
             ArrayList<MicroObject> t = (ArrayList<MicroObject>) ois.readObject();
             MacroObjSite[] sites = (MacroObjSite[]) ois.readObject();

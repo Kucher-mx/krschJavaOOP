@@ -11,13 +11,11 @@ import javafx.scene.shape.Rectangle;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.util.Scanner;
 
 public class MicroObjectOne extends MicroObject{
     private double staminaRegenKoef;
     private int staminaWasteKoef;
     private double speedKoef;
-    Scanner in = new Scanner(System.in);
 
     public double getSpeedKoef(){
         return this.speedKoef;
@@ -69,7 +67,6 @@ public class MicroObjectOne extends MicroObject{
                 String styleWrapper = "-fx-border-color: yellow;"
                         + "-fx-border-width: 1;"
                         + "-fx-border-style: solid;";
-                System.out.println("call showInfo");
                 this.microWrapper.setStyle(styleWrapper);
                 Main.showInfoActive(this, true);
             }else {
@@ -134,7 +131,6 @@ public class MicroObjectOne extends MicroObject{
                 String styleWrapper = "-fx-border-color: yellow;"
                         + "-fx-border-width: 1;"
                         + "-fx-border-style: solid;";
-                System.out.println("call showInfo");
                 this.microWrapper.setStyle(styleWrapper);
                 Main.showInfoActive(this, true);
             }else {

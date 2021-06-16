@@ -710,8 +710,6 @@ public class Main extends Application {
         if(berserkTimeStart == 0) {
             berserkTimeStart = new Date().getTime();
         }
-        System.out.println(berserkTimeStart + 15000 + " to " + new Date().getTime());
-        System.out.println("pressed: " + berserkPressed);
         if(berserkTimeStart + 15000 >= new Date().getTime()){
             interval = 100;
             for(MicroObject micro : microObjectsCT){

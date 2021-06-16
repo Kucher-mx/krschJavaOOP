@@ -6,13 +6,13 @@ import java.util.ArrayList;
 
 public class Serealization {
     public static void serializeNow(File file) {
-        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(file))) {
-
+        try{
+            ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(file));
             oos.writeObject(Main.microObjectsCT);
             oos.writeObject(Main.microObjectsT);
             oos.writeObject(Main.sites);
         } catch (Exception ex) {
-            System.out.println(ex.getMessage());
+            System.out.println("ser error: " + ex);
         }
     }
 
@@ -25,19 +25,6 @@ public class Serealization {
             Main.microObjectsCT = ct;
             Main.microObjectsT = t;
             Main.sites = sites;
-
-            System.out.println("in deser");
-            for (MicroObject ctunit : Main.microObjectsCT){
-                System.out.println(ctunit);
-            }
-
-            for (MicroObject tunit : Main.microObjectsT){
-                System.out.println(tunit);
-            }
-
-            for (MacroObjSite site : Main.sites){
-                System.out.println(site);
-            }
 
             Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
             double  width = screenSize.getWidth();

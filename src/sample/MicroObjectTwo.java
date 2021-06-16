@@ -48,7 +48,6 @@ public class MicroObjectTwo extends MicroObjectOne{
                 String styleWrapper = "-fx-border-color: yellow;"
                         + "-fx-border-width: 1;"
                         + "-fx-border-style: solid;";
-                System.out.println("call showInfo");
                 this.microWrapper.setStyle(styleWrapper);
                 Main.showInfoActive(this, true);
             }else {
@@ -110,7 +109,6 @@ public class MicroObjectTwo extends MicroObjectOne{
                 String styleWrapper = "-fx-border-color: yellow;"
                         + "-fx-border-width: 1;"
                         + "-fx-border-style: solid;";
-                System.out.println("call showInfo");
                 this.microWrapper.setStyle(styleWrapper);
                 Main.showInfoActive(this, true);
             }else {

@@ -11,8 +11,9 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 
 import java.io.*;
-
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.Date;
 
 public class MicroObject implements Comparable<MicroObject>, Cloneable, Serializable {
     private String characterSite;
@@ -44,7 +45,7 @@ public class MicroObject implements Comparable<MicroObject>, Cloneable, Serializ
     protected transient ImageView microImageView;
 
     public transient static int idCounter = 0;
-    private static final long serialVersionUID = 1L;
+    transient private static final long serialVersionUID = 1L;
 
     public int getLvl(){
         return this.characterLevel;

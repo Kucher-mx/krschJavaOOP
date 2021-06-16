@@ -10,7 +10,14 @@ import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 
 import java.io.*;
-import java.util.*;
+//import java.util.*;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.Queue;
+import java.util.Arrays;
 
 import static java.util.Arrays.sort;
 
@@ -41,19 +48,6 @@ public class MacroObjSite implements Serializable {
 
     public void setBelong(String newBelong){
         this.belongs = newBelong;
-    }
-
-    public MicroObject get(Queue<MicroObject> obj, int idx){
-        MicroObject element = null;
-        int size = obj.size();
-        for (int i = 0; i <= size; i++) {
-            if (i == idx) {
-                element = obj.remove();
-            } else {
-                obj.add(obj.remove());
-            }
-        }
-        return element;
     }
 
     public String fightToGet(){

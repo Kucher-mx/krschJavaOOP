@@ -257,7 +257,7 @@ public class Main extends Application {
                 dialogPane.add(B, 0, 6);
                 dialogPane.add(N, 0, 7);
                 dialogPane.add(M, 0, 8);
-                dialogPane.add(button, 0, 8);
+                dialogPane.add(button, 0, 9);
 
                 dialogPane.setHalignment(WASD, HPos.CENTER);
                 dialogPane.setValignment(WASD, VPos.CENTER);

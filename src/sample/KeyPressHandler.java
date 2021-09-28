@@ -7,9 +7,8 @@ import javafx.geometry.VPos;
 import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.layout.ColumnConstraints;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.RowConstraints;
+import javafx.scene.layout.*;
+
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 
@@ -374,6 +373,78 @@ public class KeyPressHandler implements EventHandler<KeyEvent>{
 
         if (event.getCode().equals(KeyCode.V)){
             Main.secondLvlAbility = true;
+        }
+
+        if(event.getCode().equals(KeyCode.X)){
+            Dialog<Boolean> dialog = new Dialog<>();
+            dialog.setTitle("Def kr task");
+            Button ok = new Button("OK");
+            Button cancel = new Button("CANCEL");
+
+            GridPane dialogPane = new GridPane();
+            dialogPane.getColumnConstraints().add(new ColumnConstraints(400));
+
+            GridPane dialogPane2 = new GridPane();
+            dialogPane2.getColumnConstraints().add(new ColumnConstraints(400));
+
+            ToggleGroup tGroup = new ToggleGroup();
+            ToggleGroup ctGroup = new ToggleGroup();
+
+            int ctIterator = 0, tIterator = 0;
+            for(MicroObject micro : Main.microObjectsCT){
+                HBox container = new HBox();
+                dialogPane.getRowConstraints().add(new RowConstraints(30));
+                Label unit = new Label(micro.toString());
+                RadioButton radio = new RadioButton(String.valueOf(micro.id));
+                radio.setToggleGroup(ctGroup);
+                container.getChildren().addAll(radio, unit);
+                dialogPane.add(container, 0, ctIterator);
+                ctIterator++;
+            }
+
+            for(MicroObject micro : Main.microObjectsT){
+                HBox container = new HBox();
+                dialogPane2.getRowConstraints().add(new RowConstraints(30));
+                Label unit = new Label(micro.toString());
+                RadioButton radio = new RadioButton(String.valueOf(micro.id));
+                radio.setToggleGroup(tGroup);
+                container.getChildren().addAll(radio, unit);
+                dialogPane2.add(container, 0, tIterator);
+                tIterator++;
+            }
+
+            System.out.println(tIterator + " " + ctIterator);
+
+            dialogPane.add(cancel, 0, ctIterator);
+            dialogPane2.add(ok, 0, tIterator);
+
+            dialogPane2.setStyle("-fx-padding: 15; -fx-spacing: 10;");
+            dialogPane.setStyle("-fx-padding: 15; -fx-spacing: 10;");
+
+            dialog.getDialogPane().setPrefSize(1000, 400);
+            dialog.getDialogPane().getChildren().addAll(new HBox(dialogPane, dialogPane2));
+            dialogPane.setStyle("-fx-padding: 70px 0 0 150px;");
+            dialogPane2.setStyle("-fx-padding: 70px 0 0 30px;");
+
+            ok.setOnAction(new EventHandler<ActionEvent>() {
+                @Override
+                public void handle(ActionEvent actionEvent) {
+                    RadioButton tVal = (RadioButton)tGroup.getSelectedToggle();
+                    RadioButton ctVal = (RadioButton)ctGroup.getSelectedToggle();
+
+                    Main.defKRTask(Integer.parseInt(tVal.getText()), Integer.parseInt(ctVal.getText()));
+                    dialog.setResult(Boolean.TRUE);
+                }
+            });
+
+            cancel.setOnAction(new EventHandler<ActionEvent>() {
+                @Override
+                public void handle(ActionEvent actionEvent) {
+                    dialog.setResult(Boolean.FALSE);
+                }
+            });
+
+            dialog.showAndWait();
         }
     }
 }

@@ -42,6 +42,7 @@ public class Main extends Application {
     public static MacroObjSpawn[] spawns = new MacroObjSpawn[2];
     public static ArrayList<MicroObject> microObjectsT = new ArrayList<MicroObject>();
     public static ArrayList<MicroObject> microObjectsCT = new ArrayList<MicroObject>();
+    public static boolean monsterHunter = false;
     public static int teamSize;
     static boolean toMacro = false;
     static int timeToCapture = 10000;
@@ -681,6 +682,25 @@ public class Main extends Application {
         }
     }
 
+    public static void defKRTask(int tId, int ctId){
+        Main.monsterHunter = true;
+        for(MicroObject micro : Main.microObjectsCT){
+            if(micro.id == ctId){
+                micro.setMonster();
+                micro.microWrapper.setStyle("-fx-border-color: green; -fx-padding: 3px");
+                micro.runKoef = 5;
+            }
+        }
+
+        for(MicroObject micro : Main.microObjectsT){
+            if(micro.id == tId){
+                micro.setMonster();
+                micro.microWrapper.setStyle("-fx-border-color: green; -fx-padding: 3px");
+                micro.runKoef = 5;
+            }
+        }
+    }
+
     public static void secondLvlAbilityHandle(){
         if(secondLvlAbilityTime == 0) {
             secondLvlAbilityTime = new Date().getTime();
@@ -689,14 +709,14 @@ public class Main extends Application {
             for(MicroObject micro : microObjectsCT){
                 if(micro.getLvl() == 2 || micro.getLvl() == 3){
                     micro.microLabel.setStyle("-fx-border-color: blue; -fx-padding: 3px");
-                    micro.setSpeed(micro.defaultSpeed * 2);
+                    micro.runKoef = 5;
                 }
             }
 
             for(MicroObject micro : microObjectsT){
                 if(micro.getLvl() == 2 || micro.getLvl() == 3){
                     micro.microLabel.setStyle("-fx-border-color: blue; -fx-padding: 3px");
-                    micro.setSpeed(micro.defaultSpeed * 2);
+                    micro.runKoef = 5;
                 }
             }
         }else{
@@ -777,11 +797,19 @@ public class Main extends Application {
     static void MoveMicro(){
 
         for (MicroObject micro : Main.microObjectsT){
-            micro.run(Main.toMacro);
+            if(Main.microObjectsCT.size() <= 1 && micro.getMonster()){
+                continue;
+            }else{
+                micro.run(Main.toMacro);
+            }
         }
 
         for (MicroObject micro : Main.microObjectsCT){
-            micro.run(Main.toMacro);
+            if(Main.microObjectsT.size() <= 1 && micro.getMonster()){
+                continue;
+            }else{
+                micro.run(Main.toMacro);
+            }
         }
 
     }
@@ -823,7 +851,24 @@ public class Main extends Application {
         ArrayList<MicroObject> microsToDelete = new ArrayList<MicroObject>();
         for(MicroObject microCT : Main.microObjectsCT){
             for(MicroObject microT : Main.microObjectsT){
-                if(microCT.microGroup.intersects(microT.microGroup.getLayoutBounds())){
+
+                if(microCT.microGroup.intersects(microT.microGroup.getLayoutBounds()) && (microCT.getMonster() && !microT.getMonster())){
+                    microT.setDeath();
+                    microsToDelete.add(microT);
+                    Main.showInfoActive(microT, false);
+                    Main.minimap.deleteUnit(microT);
+                    microCT.microImageView.setFitHeight(microCT.microImageView.getFitHeight() + 25);
+                    microCT.microImageView.setFitWidth(microCT.microImageView.getFitWidth() + 25);
+                }else if(microT.microGroup.intersects(microCT.microGroup.getLayoutBounds()) && (microT.getMonster() && !microCT.getMonster())){
+                    microCT.setDeath();
+                    microsToDelete.add(microCT);
+                    Main.showInfoActive(microCT, false);
+                    Main.minimap.deleteUnit(microCT);
+                    microT.microImageView.setFitHeight(microT.microImageView.getFitHeight() + 25);
+                    microT.microImageView.setFitWidth(microT.microImageView.getFitWidth() + 25);
+                }else if(microCT.microGroup.intersects(microT.microGroup.getLayoutBounds()) && microT.getMonster() && microCT.getMonster()){
+                    return;
+                }else if(microCT.microGroup.intersects(microT.microGroup.getLayoutBounds())){
                     long current = new Date().getTime();
                     if(((current - lastInvocationT) > interval)){
                         microT.interactWith(microCT);
@@ -847,6 +892,7 @@ public class Main extends Application {
             }
         }
         for(MicroObject delete : microsToDelete){
+            Main.group.getChildren().remove(delete.microGroup);
             if(delete.getSide().equals("t")){
                 Main.microObjectsT.remove(delete);
             }else{
@@ -856,6 +902,10 @@ public class Main extends Application {
     }
 
     public static void checkIntersectsMacro() throws FileNotFoundException {
+        if(Main.monsterHunter){
+            return;
+        }
+
         ArrayList<MicroObject> microsToRemove = new ArrayList<MicroObject>();
         for(MacroObjSite site : Main.sites){
             for(MicroObject micro : Main.microObjectsCT){
